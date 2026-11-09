@@ -20,6 +20,7 @@ const sourceTrees = new Map([
   ['tests/desktop', new Set(['.ts'])],
 ]);
 const excludedDirectories = new Set(['node_modules', 'data', 'backups', 'source-documents', 'artifacts', 'outputs', 'sandboxes', 'runtime', 'dist', '__pycache__']);
+const excludedDirectory = path => excludedDirectories.has(path.split('/').at(-1)) && path !== 'src/features/backups';
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const sourceHash = files => hash(JSON.stringify(files.map(({ path, bytes, sha256 }) => ({ path, bytes, sha256 }))));
 const releaseVersion = value => typeof value === 'string' && /^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(value);
@@ -27,7 +28,7 @@ export function allowedReleasePath(path) {
   if (typeof path !== 'string') return false;
   if (fixedFiles.includes(path) || path === 'INSTALL.txt') return true;
   const parts = path.split('/');
-  if (parts.some(part => !part || part.startsWith('.') || excludedDirectories.has(part)) || path.includes('\\')) return false;
+  if (parts.some((part, index) => !part || part.startsWith('.') || excludedDirectory(parts.slice(0, index + 1).join('/'))) || path.includes('\\')) return false;
   return [...sourceTrees].some(([tree, extensions]) => path.startsWith(`${tree}/`) && extensions.has(extname(path)));
 }
 
@@ -48,8 +49,8 @@ export async function collectRelease(directory) {
   async function walk(tree) {
     if ((await lstat(join(directory, tree))).isSymbolicLink()) throw new Error(`Release source cannot contain symlinks: ${tree}`);
     for (const entry of await readdir(join(directory, tree), { withFileTypes: true })) {
-      if (entry.name.startsWith('.') || excludedDirectories.has(entry.name)) continue;
       const path = `${tree}/${entry.name}`;
+      if (entry.name.startsWith('.') || excludedDirectory(path)) continue;
       if (entry.isSymbolicLink()) throw new Error(`Release source cannot contain symlinks: ${path}`);
       if (entry.isDirectory()) await walk(path);
       else if (allowedReleasePath(path)) await add(path);

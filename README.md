@@ -2,7 +2,7 @@
 
 A local finance application that connects a transaction ledger, document review, cash-flow planning, and a Python calculation engine. React provides the interface, Node owns the local API and SQLite records, and a Swift macOS shell packages the desktop app.
 
-[Engineering notes](ENGINEERING.md) explain the mechanisms and tradeoffs. How can a statement retry remain safe when the original file or ledger command may already have been saved?
+[Engineering notes](ENGINEERING.md) trace statement retries, ledger writes, recovery, and stale-edit protection.
 
 [Product portfolio](https://github.com/hxssank/recruiter-portfolio)
 
@@ -59,19 +59,29 @@ On macOS, `npm run mac:build` creates the desktop package. Review the build scri
 
 ## Validation
 
-On November 9, 2026, TypeScript checking and all 437 tests in `shared/*.test.ts` passed against this source snapshot. The shared tests cover money calculations, schedules, statement matching, planning, and workbook formulas. They used the existing local dependency environments.
+The following checks passed on November 9, 2026 in a fresh macOS ARM64 checkout with Node 24.22.0, Python 3.13.16, and the locked dependencies:
+
+| Check | Result |
+| --- | --- |
+| Node application tests | 2,030 passed |
+| Python engine tests and Ruff | 560 passed; lint passed |
+| Release archive and native-package tests | 44 passed |
+| TypeScript, production build, and architecture boundaries | Passed |
+| Backup controls in WebKit at 320 px and 1440 px, plus sample/snapshot isolation | 4 passed |
+| Clean source-release installation | Passed |
+
+The clean-install check extracts the source ZIP into a new directory, installs its dependencies, builds the app, and starts isolated services. It verifies every served asset hash, checks empty records, round-trips a synthetic complete backup, and confirms both services stop. Personal records and the installed app are not used.
 
 ```sh
-npm run typecheck
-node --test shared/*.test.ts
-npm test
 npm run check:release
+npm run test:browser
+npm run release:verify
 ```
 
-The [initial hosted release check](https://github.com/hxssank/mazal/actions/runs/42689324682) failed on a stale Home-label assertion, a dialog test that assumed transparency was enabled, and two Windows filesystem assertions. The test corrections preserve backup isolation, keyboard focus, cache verification, and symlink-target checks. On November 9, 2026, the corrected source built locally, 16 focused release tests passed, and three affected Chromium checks passed against isolated synthetic records. The [latest hosted rerun](https://github.com/hxssank/mazal/actions/runs/42693712741) also failed. Ubuntu stopped at "Verify installation from the source release", Windows at "Validate source, models, and builds", and macOS at "Verify Mac app browser workflows". These step names identify the failed check boundaries, not their root causes. The full operating-system matrix has not passed; the local results do not establish a fully validated release.
+The [pre-fix hosted run](https://github.com/hxssank/mazal/actions/runs/42697649145) exposed three defects: the source packager omitted the backup UI directory, a Python test decoded UTF-8 output with the Windows default encoding, and WebKit tests tried to fulfill a cached 304 response. This snapshot fixes those causes and adds archive coverage for the missing modules. See [Release checks](https://github.com/hxssank/mazal/actions/workflows/ci.yml) for the current Linux, macOS, and Windows results. Local passes do not establish a passing operating-system matrix.
 
 ## Current limits
 
-This is a personal desktop application under development. Forecasts depend on the records and assumptions entered. An apparent payroll match is evidence to review, not proof of payment. Hardware installation, clean dependency installation, and all operating-system combinations were not verified for this GitHub snapshot.
+This is a personal desktop application under development. Forecasts depend on the records and assumptions entered. An apparent payroll match is evidence to review, not proof of payment. The installed macOS app and all operating-system combinations were not verified for this GitHub snapshot.
 
 The API is designed for a local desktop session. A hosted, multi-user product would need account authentication, authorization per record, tenant isolation, managed key storage, and deployment monitoring before exposing it to the internet.

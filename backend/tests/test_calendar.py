@@ -59,7 +59,7 @@ def node_result(script: str, input: Any = None) -> Any:
         [node, "--experimental-strip-types", "--input-type=module", "-e", script],
         cwd=Path(__file__).resolve().parents[2],
         input=json.dumps(input),
-        text=True,
+        encoding="utf-8",
         capture_output=True,
         check=True,
     )

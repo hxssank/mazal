@@ -33,6 +33,7 @@ async function fixture(t) {
   const source = join(directory, 'source');
   const paths = ['.gitignore', '.node-version', '.github/workflows/ci.yml', 'package.json', 'package-lock.json', 'index.html', 'tsconfig.json', 'tsconfig.ui.json', 'tsconfig.server.json', 'vite.config.ts', 'backend/pyproject.toml', 'backend/uv.lock', 'backend/.python-version', 'public/icon.svg', 'public/fonts/OFL.txt', 'public/fonts/barlow-condensed-bold.ttf', 'src/App.tsx', 'shared/types.ts', 'server/index.ts', 'scripts/setup.mjs', 'backend/mazal_engine/app.py', 'backend/tests/test_app.py'];
   paths.push('macos/Mazal.swift');
+  paths.push('src/features/backups/AutomaticBackup.tsx', 'src/features/backups/CompleteBackup.tsx');
   paths.push('playwright.config.ts', 'tests/desktop/navigation.spec.ts');
   for (const path of paths) { const absolute = join(source, path); await mkdir(dirname(absolute), { recursive: true }); await writeFile(absolute, 'synthetic release fixture'); }
   await writeFile(join(source, 'package.json'), JSON.stringify({ name: 'mazal', version: '0.2.0-rc.1' }));
@@ -44,7 +45,7 @@ async function fixture(t) {
 
 test('source release excludes private data, runtime caches, experiments, and unexpected file formats', async t => {
   const { directory, source } = await fixture(t);
-  for (const path of ['.env', 'data/live.sqlite', 'backups/live.json', 'source-documents/bank.csv', 'sandboxes/experiment.ts', 'node_modules/private.js', 'backend/.venv/private.py', 'backend/mazal_engine/__pycache__/private.py', 'src/data/private.ts', 'src/private.json']) {
+  for (const path of ['.env', 'data/live.sqlite', 'backups/live.json', 'source-documents/bank.csv', 'sandboxes/experiment.ts', 'node_modules/private.js', 'backend/.venv/private.py', 'backend/mazal_engine/__pycache__/private.py', 'src/data/private.ts', 'src/private.json', 'src/features/backups/data/private.ts', 'src/features/backups/backups/private.ts', 'src/features/backups/private.json']) {
     const absolute = join(source, path); await mkdir(dirname(absolute), { recursive: true }); await writeFile(absolute, 'PRIVATE_DATA_SENTINEL');
     assert.equal(allowedReleasePath(path), false);
   }
@@ -54,6 +55,8 @@ test('source release excludes private data, runtime caches, experiments, and une
   const zip = await JSZip.loadAsync(await readFile(result.archive));
   for (const entry of Object.values(zip.files)) assert.doesNotMatch(await entry.async('string'), /PRIVATE_DATA_SENTINEL/);
   assert.equal(await readFile(join(extracted.project, 'src/App.tsx'), 'utf8'), 'synthetic release fixture');
+  assert.equal(await readFile(join(extracted.project, 'src/features/backups/AutomaticBackup.tsx'), 'utf8'), 'synthetic release fixture');
+  assert.equal(await readFile(join(extracted.project, 'src/features/backups/CompleteBackup.tsx'), 'utf8'), 'synthetic release fixture');
   assert.equal(await readFile(join(extracted.project, 'macos/Mazal.swift'), 'utf8'), 'synthetic release fixture');
   assert.equal(await readFile(join(extracted.project, 'playwright.config.ts'), 'utf8'), 'synthetic release fixture');
   assert.equal(await readFile(join(extracted.project, 'tests/desktop/navigation.spec.ts'), 'utf8'), 'synthetic release fixture');

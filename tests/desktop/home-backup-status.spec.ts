@@ -5,7 +5,10 @@ for (const width of [320, 1440]) test(`Home exposes backup failure and its repai
   expect(initial.headers()['x-mazal-data-source']).toBe('sample');
   const before = await initial.json();
   await page.route('**/api/state?**', async route => {
-    const response = await route.fetch();
+    const headers = { ...route.request().headers() };
+    delete headers['if-none-match'];
+    delete headers['if-modified-since'];
+    const response = await route.fetch({ headers });
     await route.fulfill({ response, headers: { ...response.headers(), 'x-mazal-data-source': 'personal' } });
   });
   const mutations: string[] = [];
@@ -49,7 +52,10 @@ for (const width of [320, 1440]) test(`Home exposes backup failure and its repai
 for (const source of ['sample', 'snapshot']) test(`a ${source} preview does not request or offer automatic backup controls`, async ({ page }) => {
   let reads = 0;
   await page.route('**/api/state?**', async route => {
-    const response = await route.fetch();
+    const headers = { ...route.request().headers() };
+    delete headers['if-none-match'];
+    delete headers['if-modified-since'];
+    const response = await route.fetch({ headers });
     await route.fulfill({ response, headers: { ...response.headers(), 'x-mazal-data-source': source } });
   });
   await page.route('**/api/automatic-backup', async route => { reads++; await route.abort(); });
