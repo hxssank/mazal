@@ -2,6 +2,8 @@
 
 A local finance application that connects a transaction ledger, document review, cash-flow planning, and a Python calculation engine. React provides the interface, Node owns the local API and SQLite records, and a Swift macOS shell packages the desktop app.
 
+[Engineering notes](ENGINEERING.md) explain the mechanisms and tradeoffs. How can a statement retry remain safe when the original file or ledger command may already have been saved?
+
 [Product portfolio](https://github.com/hxssank/recruiter-portfolio)
 
 ## What the application does
@@ -66,7 +68,7 @@ npm test
 npm run check:release
 ```
 
-The [initial hosted release check](https://github.com/hxssank/mazal/actions/runs/42689324682) failed on a stale Home-label assertion, a dialog test that assumed transparency was enabled, and two Windows filesystem assertions. The test corrections preserve backup isolation, keyboard focus, cache verification, and symlink-target checks. On November 9, 2026, the corrected source built locally, 16 focused release tests passed, and three affected Chromium checks passed against isolated synthetic records. The full Linux, macOS, and Windows matrix still needs a successful rerun; these results do not establish a fully validated release.
+The [initial hosted release check](https://github.com/hxssank/mazal/actions/runs/42689324682) failed on a stale Home-label assertion, a dialog test that assumed transparency was enabled, and two Windows filesystem assertions. The test corrections preserve backup isolation, keyboard focus, cache verification, and symlink-target checks. On November 9, 2026, the corrected source built locally, 16 focused release tests passed, and three affected Chromium checks passed against isolated synthetic records. The [latest hosted rerun](https://github.com/hxssank/mazal/actions/runs/42693712741) also failed. Ubuntu stopped at "Verify installation from the source release", Windows at "Validate source, models, and builds", and macOS at "Verify Mac app browser workflows". These step names identify the failed check boundaries, not their root causes. The full operating-system matrix has not passed; the local results do not establish a fully validated release.
 
 ## Current limits
 
