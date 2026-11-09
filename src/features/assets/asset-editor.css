@@ -1,0 +1,54 @@
+.asset-editor-dialog.portfolio-dialog {
+  width: min(590px, calc(100vw - 32px));
+  background: radial-gradient(ellipse at 8% 0%, #80beaf0b, transparent 52%), #141e2bf7;
+}
+.asset-editor-dialog .asset-editor-header { align-items: center; padding: 23px 26px; }
+.asset-editor-kicker { color: #94b9ad; font-size: 11px; }
+.asset-editor-dialog .asset-editor-header h2 { margin-top: 6px; font-size: 25px; }
+.asset-editor-dialog .asset-editor-body { padding: 24px 26px; gap: 22px; }
+.asset-editor-dialog .field { color: #bac8d8; font-size: 12px; }
+.asset-editor-dialog .field > span > small { margin-left: 6px; color: #8495a8; font-size: 10px; }
+.asset-editor-dialog .field input,
+.asset-editor-dialog .field select,
+.asset-editor-dialog .field textarea { min-height: 45px; background: #0e1825c7; border-color: #bfd3eb1c; }
+.asset-editor-dialog .asset-editor-name input { font-size: 17px; min-height: 50px; }
+.asset-editor-amounts,
+.asset-editor-dates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.asset-editor-dialog .asset-editor-money-input { display: flex; align-items: center; gap: 9px; min-width: 0; min-height: 52px; padding: 0 13px; background: #0e1825c7; border: 1px solid #bfd3eb1c; border-radius: 11px; }
+.asset-editor-dialog .asset-editor-money-input:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+.asset-editor-money-input > span:first-child { color: #a0b8ae; font-size: 18px; }
+.asset-editor-money-input > span:last-child { color: #8197ac; font-size: 10px; }
+.asset-editor-dialog .asset-editor-money-input input { flex: 1; width: 0; min-width: 0; padding: 11px 0; min-height: 0; border: 0; border-radius: 0; background: transparent; font-size: 22px; font-variant-numeric: tabular-nums; outline: none; }
+.asset-editor-category-row { display: grid; grid-template-columns: minmax(145px, 1fr) auto; gap: 13px; align-items: end; }
+.asset-editor-quick-categories { display: flex; gap: 6px; min-height: 45px; align-items: center; }
+.asset-editor-quick-categories > button { display: flex; gap: 5px; align-items: center; justify-content: center; min-height: 36px; padding: 7px 10px; background: #d4e7ff04; border: 1px solid #bfd3eb16; border-radius: 9px; font-size: 11px; color: #9fb0c2; }
+.asset-editor-quick-categories > button[aria-pressed='true'] { color: #c0eadb; border-color: #a7e2cd40; background: #91cfb912; }
+.asset-editor-status { display: grid; gap: 9px; font-size: 12px; color: #bac8d8; }
+.asset-editor-status > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; background: #0d1723a8; border: 1px solid #bfd3eb15; border-radius: 12px; }
+.asset-editor-status button { min-height: 38px; padding: 7px 9px; background: transparent; border: 1px solid transparent; border-radius: 8px; color: #92a5b8; font-size: 12px; }
+.asset-editor-status button[aria-pressed='true'] { color: #d3e9df; background: #a0cdb91a; border-color: #a0cdb922; }
+.asset-editor-dialog .portfolio-sale-preview { flex-wrap: wrap; }
+.asset-editor-dialog .asset-editor-footer { padding: 17px 26px; }
+.asset-editor-footer > .button { min-height: 43px; }
+.asset-editor-footer > .button.primary { min-width: 130px; }
+.asset-editor-dialog .portfolio-dialog-note { font-size: 10px; color: #8ea1b5; }
+@media (max-width: 560px) {
+  .asset-editor-dialog.portfolio-dialog { width: calc(100vw - 20px); }
+  .asset-editor-dialog .asset-editor-header { padding: 19px; }
+  .asset-editor-dialog .asset-editor-body { padding: 21px 19px; gap: 20px; }
+  .asset-editor-category-row { grid-template-columns: 1fr; gap: 8px; }
+  .asset-editor-quick-categories { min-height: 0; }
+  .asset-editor-quick-categories > button { flex: 1; min-height: 39px; font-size: 12px; }
+  .asset-editor-dialog .asset-editor-footer { padding: 15px 19px; }
+  .asset-editor-dialog .asset-editor-footer.is-confirming { align-items: stretch; }
+  .asset-editor-dialog .portfolio-discard-actions { display: flex; gap: 8px; }
+  .asset-editor-dialog .portfolio-discard-actions > button { flex: 1; padding-inline: 10px; font-size: 11px; }
+}
+@media (max-width: 400px) {
+  .asset-editor-amounts,
+  .asset-editor-dates { grid-template-columns: 1fr; gap: 18px; }
+  .asset-editor-dialog .asset-editor-header h2 { font-size: 23px; }
+  .asset-editor-dialog .asset-editor-body { padding-inline: 17px; }
+  .asset-editor-dialog .asset-editor-footer { padding-inline: 17px; }
+  .asset-editor-dialog .asset-editor-footer > .button { flex: 1; min-width: 0; }
+}

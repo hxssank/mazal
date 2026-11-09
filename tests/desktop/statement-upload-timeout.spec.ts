@@ -1,0 +1,96 @@
+import { createHash } from 'node:crypto';
+import { expect, test } from '@playwright/test';
+import type { AppState, Command } from '../../shared/types.ts';
+import type { DocumentList } from '../../server/documents.ts';
+
+for (const savedFirst of [false, true]) test(`a stalled statement upload ${savedFirst ? 'after' : 'before'} saving its original retains the draft and stages once`, async ({ page, request }) => {
+  const response = await request.get('/api/state?workspace=live');
+  expect(response.headers()['x-mazal-data-source']).toBe('sample');
+  const before = await response.json() as AppState;
+  const cash = before.accounts.find(account => account.name === 'Browser test cash')!;
+  const name = `Statement upload ${savedFirst ? 'after' : 'before'}.csv`;
+  const bytes = Buffer.from(`TransactionDate,PostingDate,Description,Amount\r\n2026-01-02,2026-01-03,Upload ${savedFirst ? 'after' : 'before'} response loss,-12.34\r\n`);
+  const hash = createHash('sha256').update(bytes).digest('hex');
+  const sent: Command[] = [];
+  const uploads: { bytes: Buffer | null; metadata: string }[] = [];
+  let firstHandled = false;
+  await page.route('**/api/documents?workspace=live', async route => {
+    if (route.request().method() !== 'POST') return route.continue();
+    uploads.push({ bytes: route.request().postDataBuffer(), metadata: route.request().headers()['x-mazal-document'] });
+    if (uploads.length === 1) {
+      if (savedFirst) {
+        const saved = await route.fetch();
+        expect(saved.status()).toBe(201);
+      }
+      firstHandled = true;
+      return;
+    }
+    await route.continue();
+  });
+  await page.route('**/api/command?workspace=live', async route => {
+    sent.push(route.request().postDataJSON() as Command);
+    await route.continue();
+  });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.clock.install();
+  await page.goto('/#documents/imports');
+  await page.getByRole('button', { name: /^Import (another )?statement$/ }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('combobox', { name: 'Account', exact: true }).selectOption(cash.id);
+  await dialog.getByLabel('Complete statement CSV').setInputFiles({ name, mimeType: 'text/csv', buffer: bytes });
+  await expect(dialog.getByText('1 entries', { exact: true })).toBeVisible();
+  await dialog.getByLabel('Period start', { exact: true }).fill('2026-01-01');
+  await dialog.getByLabel('Period end', { exact: true }).fill('2026-01-31');
+  await dialog.getByLabel('Opening balance · CAD', { exact: true }).fill('100.00');
+  const closing = dialog.getByLabel('Closing balance · CAD', { exact: true });
+  await closing.fill('87.66');
+  await dialog.getByRole('button', { name: 'Stage for review', exact: true }).click();
+  await expect.poll(() => firstHandled).toBe(true);
+  await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
+  await page.clock.fastForward(60_001);
+  const error = dialog.getByRole('alert').filter({ hasText: /timed out/ });
+  await expect(error).toBeVisible();
+  await expect(error).toBeFocused();
+  await expect(closing).toHaveValue('87.66');
+  await expect(closing).toBeEnabled();
+  await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeEnabled();
+  expect(uploads).toHaveLength(1);
+  expect(sent).toHaveLength(0);
+  await page.keyboard.press('Escape');
+  await expect(dialog.getByRole('button', { name: 'Keep editing', exact: true })).toBeFocused();
+  await dialog.getByRole('button', { name: 'Keep editing', exact: true }).click();
+  await expect(closing).toBeFocused();
+  await dialog.getByRole('button', { name: 'Stage for review', exact: true }).click();
+  await expect(dialog.getByRole('heading', { name: 'Statement ready for review', exact: true })).toBeVisible();
+  const review = dialog.getByRole('button', { name: 'Review statement', exact: true });
+  await expect(review).toBeFocused();
+  expect(uploads).toHaveLength(2);
+  expect(uploads[0].bytes).toEqual(bytes);
+  expect(uploads[1]).toEqual(uploads[0]);
+  expect(sent).toHaveLength(1);
+  expect(sent[0].type).toBe('stage_statement');
+  const after = await (await request.get('/api/state?workspace=live')).json() as AppState;
+  const staged = after.importBatches!.filter(batch => batch.source.sha256 === hash);
+  expect(staged).toHaveLength(1);
+  expect(staged[0].status).toBe('staged');
+  expect(staged[0].source.sourceFile).toBe(name);
+  expect(staged[0].source.rows).toHaveLength(1);
+  expect(after.accounts).toEqual(before.accounts);
+  expect(after.transactions).toEqual(before.transactions);
+  expect(after.revision).toBe(before.revision + 1);
+  const library = await (await request.get('/api/documents?workspace=live')).json() as DocumentList;
+  expect(library.documents.filter(document => document.sha256 === hash)).toHaveLength(1);
+  const original = await request.get(`/api/documents/${hash}/content?workspace=live`);
+  expect(await original.body()).toEqual(bytes);
+  await review.click();
+  await expect(dialog).toHaveCount(0);
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'Home', exact: true }).click();
+  await expect(page).toHaveURL(/#home$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/#documents\/imports$/);
+  await expect(page.getByRole('heading', { name: 'Statements', exact: true, level: 1 })).toBeFocused();
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Import another statement', exact: true })).toBeEnabled();
+  expect((await (await request.get('/api/state?workspace=live')).json()).revision).toBe(after.revision);
+  expect(sent).toHaveLength(1);
+});

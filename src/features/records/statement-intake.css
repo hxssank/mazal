@@ -1,0 +1,16 @@
+.statement-intake .mazal-form-body { min-width: 0; }
+.statement-intake .mazal-form-body h3 { margin-top: 0; }
+.statement-intake-format, .statement-intake-preview { border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-width: 0; }
+.statement-intake summary { cursor: pointer; font-weight: 600; line-height: 1.5; }
+.statement-intake-format p { font-size: 13px; line-height: 1.6; color: var(--muted); }
+.statement-intake-format code { display: block; overflow-wrap: anywhere; font-size: 12px; }
+.statement-intake .field small, .statement-intake .mazal-import-summary small { display: block; color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 5px; overflow-wrap: anywhere; }
+.statement-intake-balance { border-left: 2px solid var(--green); padding: 4px 12px; }
+.statement-intake-balance p { font-size: 13px; line-height: 1.6; margin: 4px 0; }
+.statement-intake-balance strong { font-size: 14px; }
+.statement-intake-balance.has-difference { border-color: #dfaf70; }
+.statement-intake .mazal-import-table td:first-child { overflow-wrap: anywhere; }
+.statement-intake .mazal-import-table table { table-layout: fixed; }
+.statement-intake .mazal-import-table th:last-child { width: 100px; }
+.statement-intake .mazal-import-table small { display: block; font-size: 11px; line-height: 1.5; color: var(--muted); }
+.statement-intake .mazal-dialog-footer .button { white-space: normal; }

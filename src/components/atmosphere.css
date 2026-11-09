@@ -1,0 +1,15 @@
+.atmosphere.liquid-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 4% 20%, #123044 0%, transparent 58%), radial-gradient(ellipse at 48% 12%, #182438 0%, transparent 52%), radial-gradient(ellipse at 48% 92%, #251b43 0%, transparent 50%), radial-gradient(ellipse at 96% 62%, #341735 0%, transparent 56%), #080d17;
+  contain: strict;
+}
+.liquid-atmosphere canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+}

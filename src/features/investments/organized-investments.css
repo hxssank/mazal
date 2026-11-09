@@ -1,0 +1,53 @@
+.workspace-theme.daily-workspace.organized-workspace .investments-page :is(.holdings-review-total > strong, .holdings-allocation-option > strong) { font-family: inherit; }
+.workspace-theme.daily-workspace.organized-workspace .investments-page :is(.portfolio-total-bar, .portfolio-account-list, .portfolio-business-card, .portfolio-sol-card, .holdings-add-sol) { background: var(--glass-fill); border-color: var(--line); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .holdings-review-panel { --text: #f0fff9; --muted: #dcf8ed; --accent-text: #9cffe3; background: radial-gradient(ellipse at 0 0, #21e4ab2b, transparent 62%), radial-gradient(ellipse at 100% 100%, #22b5e333, transparent 60%), linear-gradient(120deg, #06694db8, #123d68b8); border-color: #78f3c65e; box-shadow: inset 0 1px 0 #d9fff47a, inset 0 -1px 0 #82f4df24, 0 14px 38px #023d3747; -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .holdings-review-total > strong { color: #d4fff0; text-shadow: 0 2px 18px #20e5b025; }
+.workspace-theme.daily-workspace.organized-workspace .investments-page :is(.holdings-coverage, .holdings-review-action, .holdings-allocation-option) { background: linear-gradient(145deg, #8ae8d714, #8ae8d703), #0a293f66; border-color: #97dece33; box-shadow: inset 0 1px 0 #ffffff1f; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.workspace-theme.daily-workspace.organized-workspace .investments-page :is(.holdings-review-action, .holdings-allocation-option)[aria-pressed=true] { background: linear-gradient(125deg, #10b68d38, #1683a533); border-color: #6bffd18c; box-shadow: inset 0 1px 0 #d4fff54d, 0 0 0 1px #33cba126; }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .holdings-coverage-rail > span { background: linear-gradient(90deg, #0cd18e, #53e7e0); }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .holdings-review-kicker { color: var(--muted); }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .holdings-balance-check { display: flex; flex-direction: row; align-items: center; gap: 10px; margin-top: 20px; padding: 14px 16px; border: 1px solid #e7b96352; border-radius: 10px; background: linear-gradient(135deg, #b3752333, #b3752310), #30210cc7; color: var(--warning); font-size: 12px; box-shadow: inset 0 1px 0 #ffe3a71a; }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .holdings-balance-check > span { color: var(--warning); font-size: 12px; }
+.workspace-theme.daily-workspace.organized-workspace .investments-page :is(.holdings-review-source p, .holdings-review-kicker, .portfolio-account-row small) { font-size: 12px; line-height: 1.5; }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .portfolio-account-row h3 { font-size: 14px; }
+.holdings-balance-check > svg { flex-shrink: 0; }
+.holdings-balance-check > span { flex: 1; line-height: 1.5; }
+.holdings-balance-check > button { display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .holdings-allocation-disclosure { margin-top: 18px; border-top: 1px solid var(--line); }
+.holdings-allocation-disclosure > summary, .holdings-add-sol > summary { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 16px 0 0; cursor: pointer; list-style: none; color: var(--text); font-size: 13px; }
+.holdings-allocation-disclosure > summary::-webkit-details-marker, .holdings-add-sol > summary::-webkit-details-marker { display: none; }
+.holdings-allocation-disclosure > summary > svg, .holdings-add-sol > summary > svg { flex-shrink: 0; color: var(--muted); }
+.holdings-allocation-disclosure[open] > summary > svg, .holdings-add-sol[open] > summary > svg { transform: rotate(180deg); }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .portfolio-holdings-grid.single-holding-group { grid-template-columns: minmax(0, 1fr); }
+.workspace-theme.daily-workspace.organized-workspace .investments-page .holdings-add-sol { margin-top: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--glass-fill); }
+.holdings-add-sol > summary { padding: 17px 20px; }
+.holdings-add-sol > div { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 0 20px 20px; }
+.holdings-add-sol > div > p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+@media (max-width: 540px) {
+  .workspace-theme.daily-workspace.organized-workspace .investments-page .holdings-balance-check { align-items: flex-start; flex-wrap: wrap; }
+  .holdings-balance-check > span { flex-basis: calc(100% - 28px); }
+  .holdings-balance-check > button { margin-left: 26px; }
+}
+.investments-page .investment-allocation-glance { margin-top: 22px; }
+.portfolio-page .investment-allocation-glance .holdings-allocation-rail { margin-top: 0; height: 11px; }
+.investment-allocation-caption { display: flex; justify-content: space-between; gap: 12px; margin-top: 11px; }
+.investment-allocation-caption > span { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.investment-allocation-caption > span > strong { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+.investment-allocation-caption i { display: block; flex-shrink: 0; width: 6px; height: 6px; border-radius: 2px; background: #c7a4fa; }
+.investment-allocation-caption > span:last-child i { background: #a4e4cf; }
+.investment-price-context { display: flex; align-items: center; gap: 12px; margin-top: 22px; padding: 17px 0 0; border-top: 1px solid var(--line); }
+.investment-price-icon { display: grid; place-items: center; flex-shrink: 0; width: 35px; height: 38px; border: 1px solid #c7a4fa24; border-radius: 10px; color: #c7a4fa; background: #c7a4fa09; }
+.investment-price-context > div { flex: 1; min-width: 0; }
+.investment-price-context strong { font-size: 12px; font-weight: 500; line-height: 1.5; }
+.investment-price-context p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+.investment-price-context > button { display: flex; align-items: center; gap: 7px; flex-shrink: 0; font-size: 12px; }
+.app-shell[data-motion='on'] .investment-allocation-glance .holdings-allocation-rail > span { transition: width .5s cubic-bezier(.2,.7,.2,1); }
+@media (max-width: 540px) {
+  .investment-allocation-caption { flex-wrap: wrap; gap: 8px 15px; }
+  .investment-price-context { flex-wrap: wrap; align-items: flex-start; }
+  .investment-price-context > div { flex-basis: calc(100% - 47px); }
+  .investment-price-context > button { margin-left: 47px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell[data-motion='on'] .investment-allocation-glance .holdings-allocation-rail > span { transition: none; }
+}

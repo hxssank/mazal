@@ -1,0 +1,65 @@
+{
+  "name": "mazal",
+  "version": "0.2.0-rc.3",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.15.0 <25"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/start.mjs",
+    "agent": "node scripts/local-agent.mjs",
+    "bank:update": "node scripts/bank-update.mjs",
+    "preview:records": "npm run build && node scripts/preview-records.mjs",
+    "mac:build": "node scripts/build-mac-app.mjs",
+    "mac:check": "node scripts/check-macos.mjs",
+    "mac:keychain:check": "node scripts/check-backup-keychain.mjs",
+    "mac:install": "npm run check && npm run build && node scripts/build-mac-app.mjs --install --skip-build",
+    "mac:status": "node scripts/mac-release-status.mjs",
+    "test": "node --test scripts/check-changed.test.mjs scripts/check-engine.test.mjs scripts/check-boundaries.test.mjs scripts/startup.test.mjs scripts/preview-records.test.mjs scripts/local-agent.test.mjs scripts/bank-update.test.mjs server/*.test.ts shared/*.test.ts src/*.test.ts",
+    "test:browser": "npm run build && playwright test",
+    "check": "npm run check:boundaries && npm run typecheck && node scripts/check-changed.mjs --engine",
+    "typecheck": "tsc --noEmit",
+    "engine:setup": "uv sync --project backend --frozen",
+    "engine:test": "node scripts/check-engine.mjs test",
+    "engine:check": "node scripts/check-engine.mjs lint",
+    "setup": "node scripts/setup.mjs",
+    "release:package": "node scripts/release.mjs",
+    "release:verify": "node scripts/clean-install.mjs",
+    "release:test": "node --test scripts/release.test.mjs scripts/macos-target.test.mjs scripts/package-copy.test.mjs scripts/native-build-cache.test.mjs scripts/mac-release-status.test.mjs",
+    "dev:ui": "vite",
+    "dev:api": "node scripts/dev.mjs --api",
+    "check:changed": "node scripts/check-changed.mjs --engine",
+    "check:ui": "npm run typecheck:ui && npm run check:boundaries && node scripts/check-changed.mjs",
+    "check:server": "npm run typecheck:server && npm run check:boundaries && node scripts/check-changed.mjs",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "check:release": "npm run check:boundaries && npm run release:test && npm run engine:check && npm run engine:test && npm run build && npm test",
+    "typecheck:ui": "tsc --noEmit -p tsconfig.ui.json",
+    "typecheck:server": "tsc --noEmit -p tsconfig.server.json"
+  },
+  "dependencies": {
+    "exceljs": "4.4.0",
+    "fast-formula-parser": "1.0.19",
+    "gsap": "^3.15.0",
+    "jszip": "3.10.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^6.1.2",
+    "jsdom": "^30.1.3",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.4"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "11.1.1"
+    }
+  }
+}

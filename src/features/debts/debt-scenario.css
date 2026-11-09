@@ -1,0 +1,100 @@
+.debt-scenario.debt-payoff-lab { padding: 28px; }
+.debt-scenario-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: 22px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.debt-scenario-heading > div { min-width: 0; }
+.debt-scenario-heading span { display: block; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.debt-scenario-heading h2 { margin: 7px 0 0; font-size: 23px; font-weight: 500; line-height: 1.3; letter-spacing: -.5px; overflow-wrap: anywhere; }
+.debt-scenario-balance { text-align: right; flex-shrink: 0; }
+.debt-scenario-balance strong { display: block; margin-top: 6px; color: var(--text); font-size: 27px; font-weight: 500; letter-spacing: -.6px; font-variant-numeric: tabular-nums; }
+.debt-scenario-workspace { display: grid; grid-template-columns: minmax(230px, .85fr) minmax(0, 1.3fr); gap: 28px; align-items: start; }
+.debt-scenario-controls { min-width: 0; }
+.debt-scenario .debt-extra-control { margin: 0; padding: 0; border: 0; }
+.debt-scenario .debt-extra-control > label { align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 12px; }
+.debt-scenario .debt-extra-control > label > span { font-size: 13px; }
+.debt-scenario .debt-extra-control > label > strong { font-size: 36px; font-weight: 500; letter-spacing: -1px; }
+.debt-scenario .debt-extra-control > label small { font-size: 12px; }
+.debt-scenario .debt-extra-control input[type=range] { display: block; width: 100%; min-height: 36px; padding: 0; }
+.debt-scenario .debt-extra-presets { flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
+.debt-scenario .debt-extra-presets > button { flex: 1 1 48px; min-height: 38px; font-size: 11px; padding: 7px 6px; }
+.debt-scenario-basis { display: grid; gap: 8px; margin-top: 21px; padding-top: 17px; border-top: 1px solid var(--line); }
+.debt-scenario-basis p, .debt-scenario-preview-note { color: var(--muted); font-size: 11px; line-height: 1.7; margin: 0; }
+.debt-scenario-basis .text-button { justify-self: start; padding: 4px 0; font-size: 11px; }
+.debt-scenario-preview-note { margin-top: 16px; }
+.debt-scenario-estimate { display: flex; align-items: flex-start; gap: 9px; margin-top: 16px; color: var(--text); font-size: 11px; line-height: 1.6; }
+.debt-scenario-estimate input { flex-shrink: 0; margin: 3px 0 0; accent-color: var(--accent); }
+.debt-scenario-estimate small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+.debt-scenario .debt-unsaved { margin-top: 12px; text-align: left; color: var(--debt-amber); }
+.debt-scenario .debt-comparison { padding: 22px; margin: 0; }
+.debt-scenario .debt-comparison-dates { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: start; gap: 14px; }
+.debt-scenario .debt-comparison-dates.is-minimum-only { grid-template-columns: minmax(0, 1fr); }
+.debt-scenario .debt-comparison-dates > div:last-child { text-align: left; }
+.debt-scenario .debt-comparison-dates > svg { align-self: center; width: 17px; }
+.debt-scenario .debt-comparison-dates strong { font-size: 24px; line-height: 1.3; overflow-wrap: anywhere; }
+.debt-scenario .debt-comparison-dates span { font-size: 11px; }
+.debt-scenario .debt-comparison-dates small { font-size: 11px; line-height: 1.5; }
+.debt-scenario .debt-comparison-savings { gap: 15px; margin-top: 18px; padding-top: 18px; }
+.debt-scenario .debt-comparison-savings > div { min-width: 0; gap: 7px; }
+.debt-scenario .debt-comparison-savings strong { font-size: 17px; line-height: 1.4; }
+.debt-scenario .debt-payoff-curve { margin-top: 24px; }
+.debt-scenario .debt-payoff-message { min-height: 120px; padding: 16px; margin-top: 18px; }
+.debt-scenario-missing { display: grid; justify-items: start; align-content: center; gap: 18px; min-height: 220px; }
+.debt-scenario-missing .debt-inputs-needed { margin: 0; max-width: 430px; font-size: 13px; line-height: 1.75; }
+.debt-scenario-missing .button { font-size: 11px; }
+.debt-scenario-status { padding: 12px 15px; margin: 0 0 20px; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.debt-scenario > .debt-base-warning { margin: 0 0 18px; }
+.debt-scenario-details { margin-top: 26px; border-top: 1px solid var(--line); }
+.debt-scenario-details > summary { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 20px 0 0; cursor: pointer; color: var(--text); font-size: 13px; list-style: none; }
+.debt-scenario-details > summary::-webkit-details-marker { display: none; }
+.debt-scenario-details > summary::after { content: '+'; color: var(--muted); font-size: 20px; font-weight: 400; line-height: 1; }
+.debt-scenario-details[open] > summary::after { content: '−'; }
+.debt-scenario-details > summary > span { flex: 1; }
+.debt-scenario-details > summary > small { color: var(--muted); font-size: 10px; text-align: right; }
+.debt-scenario-details-body { padding-top: 8px; }
+.debt-scenario-details-body .debt-selected-balance { padding: 18px 0; }
+.debt-scenario-details-body .debt-lab-inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.debt-scenario-details-body .debt-lab-inputs label { min-width: 0; }
+.debt-scenario-details-body .debt-lab-inputs select { width: 100%; margin-top: 10px; min-height: 42px; }
+.debt-scenario-details-body .debt-lab-inputs input { min-width: 0; }
+.debt-scenario-details-body .debt-local-note { font-size: 11px; line-height: 1.7; }
+.debt-scenario-details-body .debt-save-terms { margin-top: 20px; }
+.debt-scenario-details-body .debt-save-terms > label { font-size: 11px; }
+.debt-scenario-details-body .debt-lab-assumptions { padding-top: 17px; margin-top: 20px; border-top: 1px solid var(--line); }
+.debt-scenario-assumptions { padding-top: 20px; margin-top: 20px; border-top: 1px solid var(--line); }
+.debt-scenario-assumptions h3 { color: var(--text); font-size: 12px; font-weight: 500; margin: 0 0 10px; }
+.debt-scenario-assumptions p { margin: 8px 0 0; color: var(--muted); font-size: 11px; line-height: 1.75; }
+@media (max-width: 950px) {
+  .debt-scenario-workspace { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .debt-scenario .debt-extra-control > label { flex-direction: row; align-items: center; }
+  .debt-scenario .debt-extra-control > label > strong { font-size: 30px; }
+  .debt-scenario-missing { min-height: 160px; }
+}
+@media (max-width: 550px) {
+  .debt-scenario.debt-payoff-lab { padding: 20px 16px; }
+  .debt-scenario-heading { gap: 15px; padding-bottom: 18px; margin-bottom: 20px; }
+  .debt-scenario-heading h2 { font-size: 19px; }
+  .debt-scenario-balance { flex-shrink: 1; }
+  .debt-scenario-balance strong { font-size: 23px; overflow-wrap: anywhere; }
+  .debt-scenario .debt-extra-control > label { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .debt-scenario .debt-extra-control > label > span { max-width: none; }
+  .debt-scenario .debt-extra-control > label > strong { font-size: 33px; }
+  .debt-scenario .debt-extra-presets > button { flex-basis: 60px; }
+  .debt-scenario .debt-comparison { padding: 18px 14px; }
+  .debt-scenario .debt-comparison-dates { gap: 9px; }
+  .debt-scenario .debt-comparison-dates strong { font-size: 20px; }
+  .debt-scenario .debt-comparison-dates small { font-size: 10px; }
+  .debt-scenario .debt-comparison-savings { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .debt-scenario .debt-comparison-savings strong { font-size: 15px; }
+  .debt-scenario .debt-curve-legend { flex-wrap: wrap; gap: 9px 18px; font-size: 9px; }
+  .debt-scenario-details > summary { flex-wrap: wrap; gap: 7px; line-height: 1.5; }
+  .debt-scenario-details > summary > span { flex-basis: calc(100% - 28px); order: 0; }
+  .debt-scenario-details > summary::after { order: 1; }
+  .debt-scenario-details > summary > small { flex-basis: 100%; text-align: left; order: 2; }
+  .debt-scenario-details-body .debt-lab-inputs { grid-template-columns: minmax(0, 1fr); }
+  .debt-scenario-details-body .debt-selected-balance { flex-wrap: wrap; }
+  .debt-scenario-details-body .debt-save-terms > label { max-width: none; }
+}
+
+.debt-curve-plot { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 10px; align-items: stretch; }
+.debt-curve-axis { display: flex; flex-direction: column; justify-content: space-between; padding-block: 10px; color: var(--muted); font-size: 11px; text-align: right; font-variant-numeric: tabular-nums; }
+.debt-curve-plot > svg { display: block; width: 100%; height: 150px; overflow: visible; }
+.debt-curve-plot path, .debt-curve-plot line { vector-effect: non-scaling-stroke; }
+.debt-curve-time { grid-column: 2; display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 11px; }

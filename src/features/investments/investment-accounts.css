@@ -1,0 +1,46 @@
+.investment-section-navigation { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-width: 0; }
+.investment-section-tabs { display: flex; gap: 4px; }
+.investment-section-tabs > button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; }
+.investment-section-tabs > button > span { font-size: 11px; opacity: .75; font-variant-numeric: tabular-nums; }
+.investments-page .investment-section-tabs > button[aria-selected='true'] { background: var(--panel); color: var(--text); border-color: var(--line); box-shadow: inset 0 0 0 1px var(--line); }
+.workspace-theme .investment-section-tabs { background: #09172d6b; border-color: var(--line); border-radius: 15px; box-shadow: inset 0 1px 0 #ffffff08; }
+.workspace-theme .investment-section-tabs > button { color: var(--muted); border-radius: 11px; min-height: 40px; }
+.workspace-theme .investment-section-tabs > button[aria-selected='true'] { color: var(--text); background: linear-gradient(140deg, #dcecff20, #dcecff08); border-color: #dcecff32; box-shadow: inset 0 1px 0 #ffffff24, 0 3px 10px #00000014; }
+.investment-tab-panel { display: flex; flex-direction: column; gap: 29px; min-width: 0; }
+.investment-tab-panel[hidden] { display: none; }
+.investment-account-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.investment-account-group { padding: 23px; min-width: 0; }
+.investment-account-group:only-child { grid-column: 1 / -1; }
+.investment-account-group-heading { display: flex; gap: 11px; align-items: center; padding-bottom: 17px; border-bottom: 1px solid var(--line); }
+.investment-account-icon { display: grid; place-items: center; flex-shrink: 0; width: 38px; height: 38px; border: 1px solid #9ddcc722; border-radius: 13px; color: #9ddcc7; background: #9ddcc70a; }
+.investment-account-receivable .investment-account-icon { color: #c4b1f0; background: #c4b1f00a; border-color: #c4b1f022; }
+.investment-account-group-heading h2 { font-size: 16px; font-weight: 500; }
+.investment-account-group-heading p { margin-top: 5px; font-size: 12px; color: var(--muted); }
+.investment-account-group .portfolio-account-row { flex-wrap: wrap; gap: 10px; padding: 20px 0; }
+.investment-account-group .portfolio-account-row:last-child { padding-bottom: 0; }
+.investment-account-group .portfolio-account-row > div { flex: 1 1 150px; }
+.investment-account-group .portfolio-account-row h3 { font-size: 14px; font-weight: 450; }
+.investment-account-group .portfolio-account-row small { font-size: 12px; line-height: 1.8; color: var(--muted); }
+.investment-account-group .portfolio-account-row > strong { font-size: 20px; font-weight: 450; margin-left: auto; }
+.investment-account-group .portfolio-account-row > .button { margin-left: 0; font-size: 12px; min-height: 38px; }
+.investment-account-group .investment-account-unchecked { color: #dac49f; }
+.investment-accounts .portfolio-footnote { font-size: 12px; color: var(--muted); }
+.investment-accounts-empty { display: flex; align-items: center; padding: 27px; gap: 17px; }
+.investment-accounts-empty .investment-account-icon { width: 48px; height: 48px; }
+.investment-accounts-empty h2 { font-size: 17px; font-weight: 500; }
+.investment-accounts-empty p, .investment-missing-cash p { margin-top: 8px; font-size: 13px; color: var(--muted); line-height: 1.7; }
+.investment-accounts-empty .button, .investment-missing-cash .button { margin-top: 18px; }
+@media (max-width: 1000px) {
+  .investment-account-groups { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .investment-section-navigation { gap: 10px; align-items: stretch; flex-wrap: wrap; }
+  .investment-section-navigation > .button { min-height: 40px; font-size: 12px; }
+  .investment-section-tabs { flex: 1; }
+  .investment-section-tabs > button { flex: 1; padding-inline: 10px; }
+  .investment-tab-panel { gap: 26px; }
+  .investment-account-group { padding: 20px; }
+  .investment-account-group .portfolio-account-row > div { flex-basis: 155px; }
+  .investment-accounts-empty { padding: 22px; align-items: flex-start; flex-wrap: wrap; }
+  .investment-accounts-empty h2 { font-size: 16px; }
+}

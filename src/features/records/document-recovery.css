@@ -1,0 +1,12 @@
+.document-recovery { min-width: 0; }
+.document-recovery h3:not(:first-child) { margin-top: 24px; }
+.document-recovery-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.document-recovery details { margin: 14px 0; }
+.document-recovery summary { cursor: pointer; }
+.document-recovery-links { list-style: none; padding: 0; display: grid; gap: 14px; }
+.document-recovery-links li { display: grid; gap: 6px; min-width: 0; }
+.document-recovery-links strong, .document-recovery li, .document-recovery .mazal-backup-preview > strong { overflow-wrap: anywhere; }
+.document-recovery select { width: 100%; min-width: 0; }
+.document-recovery .mazal-checkbox { margin: 16px 0; }
+.recovery-account-links { margin-top: 14px; display: grid; gap: 12px; }
+.recovery-account-links > button { justify-self: start; }

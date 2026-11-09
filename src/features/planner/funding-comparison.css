@@ -1,0 +1,18 @@
+.funding-comparison { margin-block: 20px; }
+.funding-comparison > p { color: var(--mp-muted); line-height: 1.5; }
+.funding-actions, .funding-checkpoint-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-block: 18px; }
+.funding-checkpoint-heading { justify-content: space-between; }
+.funding-table-scroll { overflow-x: auto; margin-block: 18px; max-width: 100%; }
+.funding-table { width: 100%; border-collapse: collapse; text-align: left; font-size: .82rem; font-variant-numeric: tabular-nums; }
+.funding-table caption { text-align: left; font-size: .95rem; font-weight: 600; padding-bottom: 12px; }
+.funding-table th, .funding-table td { border-bottom: 1px solid var(--border, #ffffff18); padding: 12px 14px; vertical-align: top; }
+.funding-table td { white-space: nowrap; }
+.funding-table th:first-child { min-width: 150px; }
+.funding-table small { display: block; font-weight: 400; margin-top: 5px; color: var(--mp-muted); }
+.funding-table tr[aria-selected="true"] { background: #70bfbb0b; }
+.funding-comparison > small { display: block; color: var(--mp-muted); overflow-wrap: anywhere; }
+@media (max-width: 600px) { .funding-table th, .funding-table td { padding: 10px 8px; } }
+
+.funding-income-sources, .funding-purchase-dates { min-width: 0; border: 1px solid var(--mp-line); border-radius: 10px; padding: 16px; margin: 12px 0; }
+.funding-income-sources legend, .funding-purchase-dates legend { padding-inline: 6px; }
+.funding-income-sources p, .funding-purchase-dates p { color: var(--mp-muted); font-size: .85rem; line-height: 1.5; }

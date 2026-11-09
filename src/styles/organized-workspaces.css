@@ -1,0 +1,213 @@
+.workspace-theme.daily-workspace.organized-workspace :is(.expense-workspace-toolbar, .planner-workspace-toolbar) {
+  padding-bottom: 16px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.workspace-theme.daily-workspace.organized-workspace :is(.expense-workspace-nav, .planner-workspace .workspace-tabs) {
+  flex: 0 1 auto;
+  width: fit-content;
+  max-width: 100%;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid #a5baff40;
+  border-radius: 12px;
+  background: var(--glass-fill);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+.workspace-theme.daily-workspace.organized-workspace :is(.expense-workspace-nav, .planner-workspace .workspace-tabs) > button {
+  min-height: 40px;
+  padding: 8px 15px;
+  color: var(--muted);
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+}
+.workspace-theme.daily-workspace.organized-workspace :is(.expense-workspace-nav, .planner-workspace .workspace-tabs) > button[aria-pressed=true] {
+  color: var(--text);
+  border-color: #91baff9c;
+  background: linear-gradient(135deg, #5879f577, #7548d65c);
+  box-shadow: inset 0 1px 0 #ffffff52, 0 2px 10px #3855bd30;
+  font-weight: 600;
+}
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard {
+  --dashboard-ink: #edf2fa;
+  --dashboard-muted: var(--muted);
+  --dashboard-line: var(--line);
+  gap: 18px;
+}
+.workspace-theme.daily-workspace.organized-workspace .expense-overview-grid { grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-overview-main { gap: 24px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard :is(.expense-dashboard-spending, .expense-recurring, .expense-category-story) {
+  border: 1px solid var(--dashboard-line);
+  border-radius: 16px;
+  background: var(--glass-fill);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-dashboard-spending { padding: 26px 28px; border-color: #b2a4ff75; background: radial-gradient(ellipse at 8% 0%, #b268ef6b, transparent 68%), linear-gradient(125deg, #5836a5c4, #1d53a9b8 60%, #172759d1); box-shadow: inset 0 1px 0 #e6dcff66, inset 0 -1px 0 #8cb5ff21, 0 14px 38px #25155330; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-dashboard-heading h2 { color: var(--text); font-size: 18px; font-weight: 550; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard :is(.expense-dashboard-total > div > span, .expense-dashboard-total > p, .expense-category-copy > span, .expense-dashboard-coverage > summary) { color: var(--muted); }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard-total { margin-block: 24px 21px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard-total > div > strong { color: var(--text); font-size: clamp(36px, 4.5vw, 56px); font-weight: 550; letter-spacing: -2px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard :is(.expense-dashboard-total > div > span, .expense-dashboard-total > p, .expense-category-copy > span) { font-size: 13px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard-spending :is(.expense-dashboard-total > div > span, .expense-dashboard-total > p, .expense-dashboard-total > p > span, .expense-month-foot, .expense-dashboard-coverage > summary) { color: #d5dff7; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard-month { background: #101a5259; border: 1px solid #b7b5ff52; box-shadow: inset 0 1px #ffffff1c; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-dashboard-month :is(button, input) { color: #e1e8ff; color-scheme: dark; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard-coverage > p { color: var(--muted); background: #192342f5; border-color: #a2b5ed52; box-shadow: 0 8px 24px #00000030; }
+.workspace-theme.daily-workspace.organized-workspace .expense-composition { height: 14px; gap: 4px; padding: 0; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-composition > button { border-radius: 4px; opacity: 1; filter: saturate(1.5) brightness(1.08); box-shadow: inset 0 1px #ffffff70, 0 2px 7px #00000020; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-category-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-category-row {
+  min-height: 68px;
+  padding: 14px 8px;
+  border: 1px solid transparent;
+  border-bottom-color: var(--line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-category-row:hover { background: #6b77cf18; border-bottom-color: #95b5ff70; transform: none; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-category-row[aria-pressed=true] { background: linear-gradient(100deg, #765ce22b, #376cbb18); border-bottom-color: #a4b8ff; box-shadow: inset 3px 0 #a4b8ff; }
+.workspace-theme.daily-workspace.organized-workspace .expense-category-symbol { width: 32px; height: 34px; border-radius: 9px; color: color-mix(in srgb, var(--category-color) 88%, #fff); background: color-mix(in srgb, var(--category-color) 27%, #1a2145); box-shadow: inset 0 1px #ffffff2c; filter: saturate(1.5); }
+.workspace-theme.daily-workspace.organized-workspace .expense-category-copy { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-category-copy > strong { font-size: 17px; white-space: nowrap; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .text-button { color: #89baff; font-size: 13px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-recurring { padding: 24px; border-top: 1px solid #c4b4ff73; }
+.workspace-theme.daily-workspace.organized-workspace .expense-recurring > .expense-dashboard-heading { margin-bottom: 16px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-recurring .expense-dashboard-heading h2 { font-size: 18px; }
+.expense-recurring-summary { display: flex; align-items: center; gap: 13px; margin: 0 0 18px; }
+.expense-recurring-summary > strong { display: grid; place-items: center; min-width: 54px; min-height: 54px; padding: 4px 10px; border-radius: 12px; color: #e4d7ff; background: linear-gradient(145deg, #8e50e757, #5a46c32e); box-shadow: inset 0 1px #e6d5ff40; font-size: 32px; font-weight: 550; letter-spacing: -1px; }
+.expense-recurring-summary > span { color: var(--text); font-size: 13px; }
+.expense-recurring-summary small { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-bills-destination { width: 100%; justify-content: space-between; }
+.expense-regular-details { margin-top: 16px; border-top: 1px solid var(--line); }
+.expense-regular-details > summary { display: flex; justify-content: space-between; align-items: center; min-height: 44px; padding-block: 12px; color: var(--muted); font-size: 13px; cursor: pointer; list-style: none; }
+.expense-regular-details > summary::-webkit-details-marker { display: none; }
+.expense-regular-details[open] > summary > svg { transform: rotate(180deg); }
+.workspace-theme.daily-workspace.organized-workspace .expense-bill-cards { gap: 0; }
+.workspace-theme.daily-workspace.organized-workspace .expense-bill-card { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-bill-disclosure { grid-template-columns: minmax(0, 1fr) auto 12px; padding: 14px 0; border-radius: 0; }
+.workspace-theme.daily-workspace.organized-workspace .expense-bill-symbol { display: none; }
+.workspace-theme.daily-workspace.organized-workspace .expense-bill-details { padding: 0 0 14px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-bill-details p { color: var(--muted); }
+.workspace-theme.daily-workspace.organized-workspace .expense-bill-details p strong,
+.workspace-theme.daily-workspace.organized-workspace .expense-bill-figure > strong,
+.workspace-theme.daily-workspace.organized-workspace .expense-story-totals dd,
+.workspace-theme.daily-workspace.organized-workspace .expense-merchant-list :is(span, strong) { color: var(--text); }
+.workspace-theme.daily-workspace.organized-workspace .expense-bill-notice { color: #e6bd77; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard :is(.expense-add-bill, .expense-bill-card-action) { color: var(--accent-text); border-color: var(--line); }
+.workspace-theme.daily-workspace.organized-workspace .expense-daily-plot { background: repeating-linear-gradient(to top, #fff0 0, #fff0 calc(50% - 1px), #2a364780 calc(50% - 1px), #2a364780 50%); }
+.workspace-theme.daily-workspace.organized-workspace .expense-daily-positive > i { background: linear-gradient(to top, #7058e9, #a990ff); box-shadow: inset 0 1px #e4d8ff70; }
+.workspace-theme.daily-workspace.organized-workspace .expense-daily-negative > i { background: linear-gradient(to bottom, #ffbf59, #d89435); }
+.workspace-theme.daily-workspace.organized-workspace :is(.expense-daily-heading strong, .expense-recent-list strong, .expense-transaction-copy > strong) { color: var(--text); }
+.workspace-theme.daily-workspace.organized-workspace .expense-recent-list > li > button { background: transparent; }
+.workspace-theme.daily-workspace.organized-workspace :is(.planner-overview, .planner-horizon, .planner-workspace .planner-agenda, .planner-workspace .planner-checklist, .planner-workspace .planner-timeline, .planner-workspace .planner-setup-card) {
+  background: var(--glass-fill);
+  border-color: var(--line);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-overview { padding: 24px; border-color: #7acbff75; background: radial-gradient(ellipse at 0% 0%, #21b7dd54, transparent 62%), linear-gradient(120deg, #15588fc7, #313b9bbd 62%, #342369cc); box-shadow: inset 0 1px 0 #c8edff66, inset 0 -1px 0 #8aabff26, 0 14px 38px #14265735; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-payday { background: linear-gradient(145deg, #86bfff17, #11164f70); border-color: #add4ff4d; border-radius: 12px; box-shadow: inset 0 1px #e3efff29; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-payday > strong { color: #a6e8ff; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-big-money > span { color: var(--muted); }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-overview :is(.planner-eyebrow, .planner-estimate, .planner-balance > p, .planner-payday > p, .planner-big-money > span) { color: #cee3fa; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-incomplete { background: #2b251d; border-color: #4e402d; border-radius: 12px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-incomplete :is(h2, p) { color: #e6bd77; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-layout { grid-template-columns: minmax(0, 1fr); }
+.workspace-theme.daily-workspace.organized-workspace .planner-sidebar { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 16px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-timeline { margin-top: 0; }
+.workspace-theme.daily-workspace.organized-workspace .planner-balance-link { grid-column: 1 / -1; margin: 0; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-event { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 20px; border: 0; border-bottom: 1px solid var(--line); padding: 12px 2px 16px; margin-bottom: 0; border-radius: 0; background: transparent; }
+.workspace-theme.daily-workspace.organized-workspace .planner-event-main { grid-column: 1 / -1; align-items: center; }
+.workspace-theme.daily-workspace.organized-workspace .planner-event-note { grid-column: 1; margin-top: 0; max-width: 85ch; }
+.workspace-theme.daily-workspace.organized-workspace .planner-excluded { grid-column: 1; margin-top: 0; }
+.workspace-theme.daily-workspace.organized-workspace .planner-event-actions { grid-column: 2; grid-row: 2 / span 2; align-self: end; margin-top: 0; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day { padding-top: 12px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-event:hover { background: #698bcb12; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-event.is-in { background: transparent; border-color: var(--line); }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-date time { margin-top: 12px; padding: 8px 4px; background: linear-gradient(145deg, #4a8ed130, #5963c81a); border-color: #9cc5ff45; border-radius: 8px; box-shadow: inset 0 1px #c7e4ff2e; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-check-number { color: #a6d5ff; background: #3579d92a; border-color: #8eb7ff40; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-cards > button { padding: 12px 11px; background: linear-gradient(145deg, #7c98ed13, #19243b66); border-color: #97b4f52d; border-radius: 10px; box-shadow: inset 0 1px #d4e3ff21; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-cards > button:hover { translate: none; border-color: #8cbbee; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-cards > button[aria-pressed=true] { background: linear-gradient(145deg, #387dd876, #5351bf5c); border-color: #a8ceffb3; box-shadow: inset 0 1px #e3f2ff70, 0 3px 14px #3266d42e; }
+.workspace-theme.daily-workspace.organized-workspace :is(.planner-horizon-heading h2, .planner-day-number, .planner-horizon-summary strong, .planner-day-cards strong) { color: var(--text); }
+.workspace-theme.daily-workspace.organized-workspace :is(.planner-horizon-heading p, .planner-day-name, .planner-horizon-summary small, .planner-horizon-summary > span, .planner-day-movements, .planner-horizon-foot, .planner-horizon-controls > div > span, .planner-horizon-range) { color: var(--muted); font-size: 12px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-horizon-controls > div > button { min-width: 36px; min-height: 36px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-movements .is-in { color: #89baff; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-cards .is-short strong { color: #ff9d96; }
+.workspace-theme.daily-workspace.organized-workspace .planner-horizon .is-unknown { color: #e6bd77; }
+.workspace-theme.daily-workspace.organized-workspace .planner-method { border-top: 1px solid var(--line); }
+.workspace-theme.daily-workspace.organized-workspace .planner-method > .text-button { margin-block: 6px 18px; }
+.planner-bill-location, .planner-review-location { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.planner-review-location { margin-bottom: 20px; }
+.planner-review-location h2 { margin: 0 0 6px; font-size: 20px; }
+.planner-review-location p { margin: 0; color: var(--muted); font-size: 13px; }
+.planner-bill-location > .button { flex-shrink: 0; }
+.workspace-theme.daily-workspace.organized-workspace :is(.expense-redesign, .planner-workspace, .planner-plan-content) { gap: 18px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-plan-toolbar { background: transparent; }
+.workspace-theme.daily-workspace.organized-workspace .expense-month-foot { color: #a4b1c4; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard-spending .expense-dashboard-heading h2 { color: var(--text); }
+.workspace-theme.daily-workspace.organized-workspace .expense-overview-actions { margin-top: 12px; padding-top: 8px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-category-heading { margin-bottom: 12px; }
+.workspace-theme.daily-workspace.organized-workspace .expense-category-heading h2 { font-size: 18px; font-weight: 550; }
+.workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-category-story { background: linear-gradient(135deg, color-mix(in srgb, var(--category-color) 14%, transparent), transparent), var(--glass-fill); border-color: color-mix(in srgb, var(--category-color) 45%, #9ab5ff30); }
+.workspace-theme.daily-workspace.organized-workspace .expense-spending-details { padding-inline: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--glass-fill); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.workspace-theme.daily-workspace.organized-workspace .expense-spending-details > summary { color: #89baff; font-size: 13px; padding-block: 14px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-big-money { color: #a6e8ff; }
+.workspace-theme.daily-workspace.organized-workspace .planner-eyebrow { font-family: inherit; font-size: 12px; letter-spacing: 0; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-balance > h2 { color: #d0f0ff; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-overview.is-short .planner-big-money { color: #ff9d96; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-horizon { padding: 24px; box-shadow: var(--glass-shadow); }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-horizon-heading h2 { font-size: 20px; font-weight: 550; }
+.workspace-theme.daily-workspace.organized-workspace .planner-horizon-controls { margin-block: 16px 12px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-cards > .is-today { border-color: #6bd6f978; background: linear-gradient(145deg, #257fbf45, #3543a530); }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-cards .is-today .planner-day-name { color: #9deaff; font-weight: 600; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-cards .is-today .planner-day-name i { background: #63e6ff; box-shadow: 0 0 8px #50d0ff80; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-cards strong { margin-top: 16px; color: #a4d8ff; }
+.workspace-theme.daily-workspace.organized-workspace .planner-day-number { margin-top: 5px; font-size: 25px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-horizon-summary strong { color: #a4d8ff; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-agenda { padding: 24px; box-shadow: var(--glass-shadow); }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-section-header h2 { font-size: 20px; font-weight: 550; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-filters { gap: 4px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-filters button { min-height: 40px; border-radius: 9px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-filters button[aria-pressed=true] { color: var(--text); background: linear-gradient(135deg, #5879f577, #7548d65c); border-color: #91baff9c; box-shadow: inset 0 1px #ffffff52; }
+.workspace-theme.daily-workspace.organized-workspace .planner-event-actions .planner-record { border-radius: 8px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-detail-toggle { padding: 16px 20px; }
+.workspace-theme.daily-workspace.organized-workspace .planner-timeline svg { color: #70c9ff; }
+@media (max-width: 1050px) {
+  .workspace-theme.daily-workspace.organized-workspace .expense-overview-grid { grid-template-columns: minmax(0, 1fr); }
+  .workspace-theme.daily-workspace.organized-workspace .expense-recurring { max-width: none; }
+  .workspace-theme.daily-workspace.organized-workspace .expense-bill-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+}
+@media (max-width: 650px) {
+  .workspace-theme.daily-workspace.organized-workspace .expense-workspace-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; }
+  .workspace-theme.daily-workspace.organized-workspace .expense-workspace-nav > button { min-width: 0; padding: 8px 3px; font-size: 12px; }
+  .workspace-theme.daily-workspace.organized-workspace .planner-workspace .workspace-tabs > button { padding-inline: 10px; font-size: 12px; }
+  .workspace-theme.daily-workspace.organized-workspace .planner-workspace-toolbar > .button { align-self: flex-start; }
+  .workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-category-list,
+  .workspace-theme.daily-workspace.organized-workspace .expense-bill-cards,
+  .workspace-theme.daily-workspace.organized-workspace .planner-sidebar { grid-template-columns: minmax(0, 1fr); }
+  .workspace-theme.daily-workspace.organized-workspace .expense-dashboard .expense-dashboard-spending { padding: 20px; }
+  .workspace-theme.daily-workspace.organized-workspace .expense-dashboard-total { align-items: flex-start; flex-direction: column; gap: 16px; }
+  .workspace-theme.daily-workspace.organized-workspace .expense-dashboard-total > p { text-align: left; }
+  .workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-overview { padding: 20px; }
+  .workspace-theme.daily-workspace.organized-workspace .planner-workspace :is(.planner-horizon, .planner-agenda) { padding: 18px; }
+  .workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-event { display: block; padding-block: 10px 14px; }
+  .workspace-theme.daily-workspace.organized-workspace .planner-event-note { margin-top: 8px; }
+  .workspace-theme.daily-workspace.organized-workspace .planner-excluded { margin-top: 8px; }
+  .workspace-theme.daily-workspace.organized-workspace .planner-event-actions { margin-top: 8px; flex-wrap: wrap; }
+  .workspace-theme.daily-workspace.organized-workspace .planner-workspace .planner-date time { padding: 7px 2px; }
+  .planner-bill-location, .planner-review-location { align-items: flex-start; flex-direction: column; gap: 16px; }
+}
+@media (max-width: 380px) {
+  .workspace-theme.daily-workspace.organized-workspace .expense-workspace-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

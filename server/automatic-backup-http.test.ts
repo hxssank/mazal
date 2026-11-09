@@ -1,0 +1,31 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { createServer } from 'node:net';
+import { fileURLToPath } from 'node:url';
+
+test('automatic backup settings, recovery keys, and captured build identity require the desktop session', async t => {
+  const root = mkdtempSync(join(tmpdir(), 'mazal-automatic-http-'));
+  const reservation = createServer(); await new Promise<void>(resolve => reservation.listen(0, '127.0.0.1', resolve));
+  const address = reservation.address(); assert.ok(address && typeof address !== 'string'); const port = address.port;
+  await new Promise<void>(resolve => reservation.close(() => resolve()));
+  const token = 'a'.repeat(64);
+  const child = spawn(process.execPath, [fileURLToPath(new URL('./index.ts', import.meta.url))], { env: { ...process.env, NODE_ENV: 'production', PORT: String(port), MAZAL_DATA_DIR: join(root, 'data'), MAZAL_MASTER_WORKBOOK: join(root, 'workbook.xlsx'), MAZAL_DESKTOP_TOKEN: token, MAZAL_ENGINE_AUTOSTART: '0', MAZAL_KEYCHAIN_HELPER: '' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  let errors = ''; child.stderr.on('data', bytes => { errors += String(bytes); });
+  t.after(async () => { if (child.exitCode === null) { const exited = new Promise<void>(resolve => child.once('exit', () => resolve())); child.kill('SIGTERM'); const timer = setTimeout(() => child.kill('SIGKILL'), 5000); await exited; clearTimeout(timer); } rmSync(root, { recursive: true, force: true }); });
+  await new Promise<void>((resolve, reject) => { const timer = setTimeout(() => reject(new Error(errors)), 10000); child.stdout.once('data', () => { clearTimeout(timer); resolve(); }); child.once('exit', code => { clearTimeout(timer); reject(new Error(`${code}: ${errors}`)); }); });
+  const base = `http://127.0.0.1:${port}`;
+  for (const path of ['/api/build-status', '/api/automatic-backup']) assert.equal((await fetch(`${base}${path}`)).status, 401);
+  assert.equal((await fetch(`${base}/api/automatic-backup/recovery-key`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).status, 401);
+  const unlock = await fetch(`${base}/api/desktop/session`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) }); assert.equal(unlock.status, 200);
+  const cookie = unlock.headers.get('set-cookie')!.split(';')[0];
+  const buildResponse = await fetch(`${base}/api/build-status`, { headers: { cookie } }); assert.equal(buildResponse.status, 200); const build = await buildResponse.json(); assert.equal(build.format, 'mazal-runtime-build');
+  const wrongMethod = await fetch(`${base}/api/build-status`, { method: 'POST', headers: { cookie } }); assert.equal(wrongMethod.status, 405);
+  const settings = await fetch(`${base}/api/automatic-backup`, { headers: { cookie } }); assert.equal(settings.status, 200); const status = await settings.json(); assert.equal(status.supported, false); assert.equal(status.configured, false); assert.equal(status.enabled, false);
+  assert.equal((await fetch(`${base}/api/automatic-backup?workspace=demo`, { headers: { cookie } })).status, 403);
+  assert.equal((await fetch(`${base}/api/automatic-backup/configure`, { method: 'POST', headers: { cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ destination: root }) })).status, 503);
+  assert.deepEqual(await (await fetch(`${base}/api/build-status`, { headers: { cookie } })).json(), build);
+});

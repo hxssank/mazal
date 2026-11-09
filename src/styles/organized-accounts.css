@@ -1,0 +1,129 @@
+.app-shell.workspace-theme.daily-workspace .account-disclosure {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--glass-fill);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+.account-disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+  cursor: pointer;
+  list-style: none;
+}
+.account-disclosure > summary::-webkit-details-marker { display: none; }
+.account-disclosure > summary > span { display: grid; gap: 6px; min-width: 0; }
+.account-disclosure > summary strong { font-size: 15px; font-weight: 600; }
+.account-disclosure > summary small { font-size: 12px; line-height: 1.6; }
+.account-disclosure > summary > svg { flex-shrink: 0; color: var(--muted); transition: transform 160ms ease; }
+.account-disclosure[open] > summary > svg { transform: rotate(180deg); }
+.account-disclosure > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 16px; }
+.account-disclosure-content { min-width: 0; padding: 0 22px 22px; }
+.asset-planning-disclosures { display: grid; gap: 12px; }
+.app-shell.workspace-theme.daily-workspace .account-disclosure-warning { color: var(--warning); }
+.app-shell.workspace-theme.daily-workspace .asset-planning-disclosures :is(.asset-planning, .asset-purchases) { margin: 0; padding: 0; border: 0; }
+.app-shell.workspace-theme.daily-workspace .asset-planning-disclosures .asset-planning > .panel { padding: 20px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; box-shadow: none; }
+.app-shell.workspace-theme.daily-workspace .asset-planning-disclosures .asset-purchases { padding-top: 20px; border-top: 1px solid var(--line); }
+.debt-account-heading-actions { display: flex; align-items: center; gap: 12px; }
+.debt-account-heading-actions > span { color: var(--muted); font-size: 12px; }
+.debt-account-heading-actions > button { white-space: nowrap; font-size: 12px; }
+.debt-planning-disclosure .debt-next-actions { margin: 0; }
+@media (max-width: 640px) {
+  .account-disclosure > summary { padding: 17px; gap: 12px; }
+  .account-disclosure-content { padding: 0 17px 17px; }
+  .account-disclosure > summary small { font-size: 11px; }
+}
+
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview {
+  --text: #fff;
+  --muted: #e0eaff;
+  --debt-layout-ink: #fff;
+  --debt-layout-muted: #e0eaff;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+  padding: 24px 26px;
+  border: 1px solid #90b4ff70;
+  border-radius: 22px;
+  background: radial-gradient(ellipse at 5% 0%, #61a8ff42, transparent 58%), radial-gradient(ellipse at 100% 100%, #9747ff60, transparent 65%), linear-gradient(120deg, #124bd2b8, #302093c7);
+  box-shadow: inset 0 1px 0 #ffffff70, inset 0 -1px 0 #9ab9ff25, 0 14px 42px #0a1b6f48;
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview .debt-total { grid-column: auto; border: 0; padding: 0; min-width: 0; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-total > strong { color: #fff; font-family: inherit; font-size: 36px; font-weight: 650; line-height: 1.15; letter-spacing: -1.2px; margin: 8px 0; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview .debt-summary-metric { padding: 0 0 0 22px; border: 0; border-left: 1px solid #ffffff2b; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-summary-metric > strong { color: #fff; font-family: inherit; font-size: 28px; font-weight: 600; line-height: 1.2; margin: 10px 0 8px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-interest-total > strong { color: #ffdda4; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-summary-metric > strong.debt-teal { color: #9af0df; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview :is(.debt-kicker, .debt-summary-metric > span) { color: #dbe5ff; font-size: 12px; font-weight: 500; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview :is(.debt-total > p, .debt-summary-metric > p, .debt-balance-key) { color: #e0eaff; font-size: 12px; line-height: 1.55; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-balance-split { height: 5px; margin: 14px 0 8px; background: #ffffff24; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-balance-split > span { background: #a7c9ff; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-balance-split > span.is-deferred { background: #ffffff40; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-balance-key { gap: 5px 12px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-balance-key i { background: #a7c9ff; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-balance-key i.is-deferred { background: #ffffff70; }
+
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-checkpoints { border-color: var(--line); background: var(--glass-fill); border-radius: 16px; box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-period { padding: 13px 18px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-checkpoints > button { padding: 13px 15px; gap: 10px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-check-icon { display: grid; width: 32px; height: 34px; border: 1px solid #b0d4ff47; border-radius: 10px; background: linear-gradient(145deg, #237efbd4, #164bc499); color: #e0efff; box-shadow: inset 0 1px 0 #ffffff42, 0 4px 12px #0869ff25; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-check-details .debt-review-check-icon { color: #ffe0a5; background: linear-gradient(145deg, #bd741aa6, #66402199); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-checkpoints > button:last-child .debt-review-check-icon { color: #ece2ff; background: linear-gradient(145deg, #9149efb8, #4e35bb99); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-checkpoints > button:is(:hover, .is-active) { background: #428dff24; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-account-map { padding: 18px; border-color: var(--line); background: var(--glass-fill); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-search { margin-top: 16px; background: #12274899; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-list-heading { margin: 15px 0 10px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review.debt-layout .debt-account-choice { padding: 16px; gap: 12px 16px; background: linear-gradient(135deg, #adcfff12, #adcfff03), #10224280; border: 1px solid var(--line); border-radius: 13px; box-shadow: inset 0 1px 0 #ffffff18; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review.debt-layout .debt-account-choice:hover { background: #2964a340; border-color: #8ec4ff66; transform: none; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review.debt-layout .debt-account-choice.is-selected { background: linear-gradient(110deg, #2577ed52, #3c45b82e); border-color: #77baff80; box-shadow: inset 3px 0 0 #66b9ff, inset 0 1px 0 #ffffff24, 0 5px 18px #0b3ca522; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-map-name > strong { font-size: 14px; font-weight: 650; line-height: 1.4; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-account-choice.is-selected .debt-map-name > strong { color: #89baff; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-map-balance > strong { font-size: 23px; font-weight: 600; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-map-interest > strong { color: #e6bd77; font-size: 18px; font-weight: 550; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-map-interest.is-unknown > strong { font-size: 12px; font-weight: 500; color: var(--muted); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-map-value > small { font-size: 12px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-map-track { height: 3px; background: #b4d5ff21; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-map-track > i { background: linear-gradient(90deg, #3983ff, #6edaff); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-map-interest .debt-map-track > i { background: linear-gradient(90deg, #e39533, #ffd17d); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-account-status { padding-top: 11px; border-top-color: var(--line); font-size: 12px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-account-check { background: linear-gradient(135deg, #9e661f24, #9e661f08), #31200db3; border-color: #e9b55c4d; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-payoff-lab { background: var(--glass-fill); border-color: var(--line); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+
+.app-shell.workspace-theme.daily-workspace.organized-workspace .asset-planning-disclosures { gap: 10px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .assets-page :is(.assets-inventory, .money-owed, .purchase-priorities, .asset-purchases) { background: var(--glass-fill); border-color: var(--line); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .assets-page :is(.holdings-coverage, .holdings-review-action) { background: linear-gradient(130deg, #36b8f01a, #9e67f018), #14234380; border-color: #b8a3f538; box-shadow: inset 0 1px 0 #ffffff20; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .assets-page .holdings-coverage-rail > span { background: linear-gradient(90deg, #1fc7f0, #af7dff); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .asset-planning-disclosures .account-disclosure { border-color: var(--line); background: var(--glass-fill); box-shadow: var(--glass-shadow); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .asset-planning-disclosures .account-disclosure > summary { padding: 16px 20px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .assets-page .assets-inventory-totals { --text: #f7f4ff; --muted: #ddd5f5; background: radial-gradient(ellipse at 0 0, #26c9ee45, transparent 60%), linear-gradient(115deg, #1c62a27d, #692db293); border-color: #bc9eff66; box-shadow: inset 0 1px 0 #ffffff50, 0 8px 24px #23105735; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .assets-page .assets-item-visual { background: linear-gradient(145deg, #168dd540, #754bd52b); border-color: var(--line); box-shadow: inset 1px 0 0 #ffffff20; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .assets-page .assets-item-visual .portfolio-device { color: #80deff; filter: drop-shadow(0 2px 9px #26baff50); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .assets-page .assets-item-listed .assets-item-visual { background: linear-gradient(145deg, #b47c1b4d, #50331580); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .assets-page .assets-item-sold .assets-item-visual { background: linear-gradient(145deg, #0aa47c4d, #0a463880); }
+
+@media (min-width: 801px) and (max-width: 1200px) {
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-checkpoints { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-period { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; padding: 9px 16px; border-bottom: 1px solid var(--line); }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-review-checkpoints > button:nth-child(2) { border-left: 0; }
+}
+@media (max-width: 800px) {
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; padding: 22px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview .debt-total { grid-column: 1 / -1; padding-bottom: 16px; border-bottom: 1px solid #ffffff2b; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview .debt-summary-metric { padding-left: 18px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview .debt-interest-total { padding-left: 0; border-left: 0; }
+}
+@media (max-width: 440px) {
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview { grid-template-columns: minmax(0, 1fr); gap: 15px; padding: 20px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-total > strong { font-size: 34px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-overview .debt-summary-metric { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: baseline; border: 0; padding: 0; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-summary-metric > strong { margin: 0; font-size: 25px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .debt-review .debt-summary-metric > p { grid-column: 1 / -1; }
+}

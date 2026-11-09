@@ -1,0 +1,143 @@
+.expense-schedule-workspace { display: grid; gap: 24px; min-width: 0; }
+.schedule-heading, .schedule-heading-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.schedule-heading h2 { margin: 0; font-size: 25px; font-weight: 500; letter-spacing: -.6px; }
+.expense-schedule-workspace p { font-size: 12px; line-height: 1.65; }
+.schedule-heading p { margin: 6px 0 0; }
+.schedule-heading select { padding: 10px 30px 10px 12px; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; font-size: 12px; min-height: 40px; }
+.schedule-heading select option { background: #17243b; color: var(--text); }
+.schedule-summary { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(240px,100%),1fr)); border: 1px solid var(--line); border-radius: 18px; background: rgba(15,29,49,.32); padding: 23px 0; }
+.schedule-summary section { padding: 0 25px; min-width: 0; }
+.schedule-summary section + section { border-left: 1px solid var(--line); }
+.schedule-summary span { font-size: 12px; color: var(--muted); }
+.schedule-summary strong { display: block; font-size: clamp(25px,3vw,35px); font-weight: 500; letter-spacing: -.8px; margin: 8px 0; overflow-wrap: anywhere; }
+.schedule-summary .is-income strong { color: var(--accent-text, var(--accent)); }
+.schedule-summary p { margin: 0; max-width: 300px; }
+.schedule-workspace { display: grid; grid-template-columns: minmax(0,1fr); gap: 22px; align-items: start; }
+.expense-schedule-workspace .schedule-agenda { padding: 24px; border-radius: 20px; min-width: 0; }
+.schedule-agenda > header { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.schedule-agenda h3, .schedule-sidebar h3, .schedule-management h3 { margin: 0; font-size: 19px; font-weight: 500; letter-spacing: -.3px; }
+.schedule-agenda header p { margin: 5px 0 0; }
+.schedule-agenda-filter { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--line); border-radius: 9px; }
+.schedule-agenda-filter button { min-height: 32px; padding: 6px 9px; border-radius: 6px; background: transparent; color: var(--muted); font-size: 11px; }
+.schedule-agenda-filter button[aria-pressed=true] { color: var(--accent-text, var(--accent)); background: color-mix(in srgb,var(--accent) 12%,transparent); }
+.schedule-days { display: grid; }
+.schedule-day { display: grid; grid-template-columns: 45px minmax(0,1fr); gap: 18px; padding-block: 23px; }
+.schedule-day + .schedule-day { border-top: 1px solid var(--line); }
+.schedule-day > time { display: grid; align-content: start; text-align: center; color: var(--muted); gap: 3px; padding-top: 3px; }
+.schedule-day > time span, .schedule-day > time small { font-size: 11px; }
+.schedule-day > time strong { font-size: 27px; font-weight: 500; color: var(--text); line-height: 1.2; }
+.schedule-event { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; gap: 6px 12px; align-items: start; min-width: 0; }
+.schedule-event + .schedule-event { margin-top: 22px; }
+.schedule-event-icon { display: grid; place-items: center; height: 30px; border-radius: 8px; background: #b9adf019; color: #c8bdef; }
+.schedule-event.is-in .schedule-event-icon { color: var(--accent-text, var(--accent)); background: color-mix(in srgb,var(--accent) 10%,transparent); }
+.schedule-event-copy { min-width: 0; }
+.schedule-event h4 { margin: 2px 0 0; font-size: 13px; font-weight: 500; line-height: 1.55; overflow-wrap: anywhere; }
+.schedule-event p { margin: 5px 0 0; font-size: 11px; }
+.schedule-event-copy small { display: block; margin-top: 5px; font-size: 11px; line-height: 1.7; }
+.schedule-event-amount { font-size: 17px; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: 3px; overflow-wrap: anywhere; }
+.schedule-event.is-in .schedule-event-amount { color: var(--accent-text, var(--accent)); }
+.schedule-event-action { grid-column: 2/-1; display: inline-flex; justify-self: start; align-items: center; gap: 7px; min-height: 30px; padding: 2px 0; border: 0; background: transparent; font-size: 11px; color: var(--accent-text, var(--accent)); text-decoration: none; }
+.schedule-agenda-note { border-top: 1px solid var(--line); margin: 0; padding-top: 16px; }
+.schedule-sidebar { display: grid; gap: 20px; min-width: 0; }
+.expense-schedule-workspace .expense-pay-card { padding: 23px; border-radius: 20px; }
+.expense-schedule-workspace .expense-pay-card::before { display: none; }
+.expense-schedule-workspace .expense-pay-value { margin-top: 20px; }
+.expense-schedule-workspace .expense-pay-value strong { font-size: 34px; padding: 0; }
+.expense-schedule-workspace .expense-pay-path { gap: 8px; }
+.expense-schedule-workspace .expense-pay-path strong { font-size: 12px; }
+.expense-schedule-workspace .schedule-needs-details { padding: 23px; border-radius: 20px; }
+.schedule-needs-details h3 { font-size: 16px; }
+.schedule-needs-details > div { margin-top: 20px; }
+.schedule-needs-details > div + div { border-top: 1px solid var(--line); padding-top: 16px; }
+.schedule-needs-details strong { font-size: 13px; font-weight: 500; }
+.schedule-needs-details p { margin: 6px 0; font-size: 11px; }
+.schedule-needs-details a { display: inline-flex; align-items: center; gap: 8px; color: var(--accent-text, var(--accent)); font-size: 11px; text-decoration: none; min-height: 32px; }
+.schedule-past { border-bottom: 1px solid var(--line); padding: 16px 0; }
+.schedule-past summary { display: flex; align-items: center; gap: 9px; color: #f2c4a4; font-size: 12px; cursor: pointer; list-style: none; }
+.schedule-past summary::-webkit-details-marker { display: none; }
+.schedule-past summary > svg:last-child { margin-left: auto; }
+.schedule-past > div { padding-top: 20px; }
+.schedule-empty { padding: 36px 15px; text-align: center; color: var(--muted); }
+.schedule-empty h4 { font-size: 15px; font-weight: 500; color: var(--text); margin: 15px 0 5px; }
+.schedule-empty p { margin: 0; }
+.schedule-management { border-top: 1px solid var(--line); padding-top: 25px; min-width: 0; }
+.schedule-management > header { display: flex; gap: 18px; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 24px; }
+.schedule-management > header p { margin: 6px 0 0; }
+.schedule-management nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.schedule-management nav button { display: flex; gap: 9px; align-items: center; border: 1px solid var(--line); border-radius: 9px; background: transparent; color: var(--muted); padding: 10px 12px; min-height: 40px; font-size: 12px; }
+.schedule-management nav button[aria-pressed=true] { color: var(--accent-text, var(--accent)); border-color: color-mix(in srgb,var(--accent) 60%,transparent); background: color-mix(in srgb,var(--accent) 8%,transparent); }
+.schedule-management nav span { font-size: 10px; }
+.schedule-management .expense-bills-heading h2 { font-size: 19px; }
+.schedule-management .bill-empty { padding: 24px; }
+.expense-schedule-workspace :is(button,a,select):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media(max-width:1050px) {
+  .schedule-workspace { grid-template-columns: minmax(0,1fr); gap: 18px; }
+  .schedule-summary section { padding-inline: 20px; }
+  .schedule-event-amount { grid-column: 2; font-size: 18px; }
+  .schedule-event-action { grid-column: 3; grid-row: 2; align-self: center; }
+  .schedule-event { grid-template-columns: 28px minmax(0,1fr) auto; gap: 4px 10px; }
+  .schedule-event-copy { grid-column: 2/-1; }
+}
+@media(max-width:800px) {
+  .schedule-workspace { grid-template-columns: minmax(0,1fr); }
+  .schedule-sidebar { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .expense-schedule-workspace .expense-pay-card { display: block; }
+  .schedule-summary section { padding-inline: 15px; }
+  .schedule-summary strong { font-size: 26px; }
+}
+@media(max-width:540px) {
+  .schedule-heading-actions { width: 100%; align-items: stretch; }
+  .schedule-heading-actions > .button { font-size: 11px; padding-inline: 10px; }
+  .schedule-heading select { font-size: 11px; max-width: 100%; }
+  .schedule-summary { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
+  .schedule-summary section { padding: 0; display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: 12px; align-items: center; }
+  .schedule-summary section + section { border-left: 0; border-top: 1px solid var(--line); padding-top: 16px; }
+  .schedule-summary strong { margin: 0; font-size: 25px; }
+  .schedule-summary p { grid-column: 1/-1; margin-top: 6px; font-size: 11px; }
+  .expense-schedule-workspace .schedule-agenda { padding: 18px 15px; }
+  .schedule-agenda > header { gap: 12px; }
+  .schedule-agenda-filter { width: 100%; }
+  .schedule-agenda-filter button { flex: 1; }
+  .schedule-day { grid-template-columns: 30px minmax(0,1fr); gap: 12px; }
+  .schedule-day > time strong { font-size: 23px; }
+  .schedule-event { grid-template-columns: minmax(0,1fr) auto; }
+  .schedule-event-icon { display: none; }
+  .schedule-event-copy { grid-column: 1/-1; }
+  .schedule-event-amount { grid-column: 1; margin-top: 8px; }
+  .schedule-event-action { grid-column: 2; grid-row: 2; font-size: 10px; margin-top: 4px; }
+  .schedule-sidebar { grid-template-columns: minmax(0,1fr); }
+  .schedule-management nav { width: 100%; }
+}
+
+.workspace-theme .expense-schedule-workspace :is(.schedule-summary .is-income strong,.schedule-event.is-in .schedule-event-amount) { color: var(--accent-text, var(--accent)); }
+
+.expense-schedule-workspace > .schedule-summary { padding: 18px 24px; }
+.expense-schedule-workspace > .schedule-summary > section { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 5px 24px; align-items: center; padding: 0; }
+.expense-schedule-workspace > .schedule-summary strong { grid-column: 2; grid-row: 1 / 3; margin: 0; font-size: 30px; }
+.expense-schedule-workspace > .schedule-summary p { max-width: none; }
+.schedule-event-actions { grid-column: 2 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+.schedule-event-actions:empty { display: none; }
+.schedule-event-actions .schedule-event-action { grid-area: auto; margin: 0; }
+.schedule-record-payment { min-height: 34px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); padding: 6px 10px; font-size: 11px; }
+.schedule-record-payment:hover:not(:disabled) { border-color: var(--accent-text); }
+.schedule-secondary { min-width: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.schedule-secondary > summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 22px; cursor: pointer; list-style: none; color: var(--text); font-size: 14px; }
+.schedule-secondary > summary::-webkit-details-marker { display: none; }
+.schedule-secondary > summary small { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.schedule-secondary[open] > summary { border-bottom: 1px solid var(--line); }
+.schedule-secondary[open] > summary > svg { transform: rotate(180deg); }
+.schedule-secondary > .schedule-management { padding: 22px; border-top: 0; }
+.schedule-income-details > .schedule-summary { margin: 20px; }
+.schedule-income-details > .schedule-pay { margin: 20px; }
+.schedule-income-details .expense-pay-card { max-width: none; }
+.schedule-history-link { display: inline-flex; align-items: center; gap: 8px; padding: 0 22px 22px; color: var(--accent-text); font-size: 12px; text-decoration: none; }
+.expense-schedule-workspace summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media(max-width:540px) {
+  .expense-schedule-workspace > .schedule-summary { padding: 16px; }
+  .expense-schedule-workspace > .schedule-summary strong { font-size: 25px; }
+  .expense-schedule-workspace > .schedule-summary p { grid-column: 1 / -1; }
+  .schedule-event-actions { grid-column: 1 / -1; gap: 8px 12px; }
+  .schedule-secondary > summary { padding: 16px; }
+  .schedule-secondary > .schedule-management { padding: 16px; }
+  .schedule-income-details > .schedule-summary, .schedule-income-details > .schedule-pay { margin: 16px; }
+}

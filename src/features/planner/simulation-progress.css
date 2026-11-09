@@ -1,0 +1,93 @@
+.planner-balance {
+  margin: 25px 0 0;
+  min-width: 0;
+  color: #24241f;
+  font-variant-numeric: tabular-nums;
+}
+
+.planner-balance .planner-balance-scale {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 2px;
+  color: #737367;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.planner-balance .planner-balance-scale > span:last-child { color: #4d4856; text-align: right; }
+.planner-balance .planner-balance-stage { display: grid; grid-template-columns: repeat(var(--planner-column-count, 4), minmax(0, 1fr)); margin-top: 3px; isolation: isolate; }
+.planner-balance .planner-balance-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0 5px 15px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 3px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.planner-balance .planner-balance-cell.is-focused { border-bottom-color: var(--planner-column-color); background: linear-gradient(0deg, #ded6ec2b, #ded6ec00 50%); }
+.planner-balance .planner-balance-cell:hover { background-color: #d9cde916; }
+.planner-balance .planner-balance-cell:focus-visible { outline: 2px solid #7546bd; outline-offset: 2px; }
+.planner-balance .planner-balance-column { width: calc(100% + 10px); height: 230px; overflow: visible; margin-bottom: -4px; }
+.planner-balance .planner-balance-grid { stroke: #cfc5d34a; stroke-width: .7; }
+.planner-balance .planner-balance-zero { stroke: #b2b6a8; stroke-width: .7; }
+.planner-balance .planner-balance-zero-label { fill: #77786c; font-family: inherit; font-size: 10px; }
+.planner-balance .planner-balance-base { fill: #e2d6e515; stroke: #b7a9c077; stroke-width: .7; }
+.planner-balance .planner-balance-prism { stroke: var(--planner-column-color); stroke-width: .65; stroke-linejoin: round; }
+.planner-balance .planner-balance-prism path { transition: d 450ms ease, opacity 150ms; }
+.planner-balance .planner-balance-cell.is-focused .planner-balance-prism { stroke-width: 1.1; }
+.planner-balance .planner-balance-cell:not(.is-focused) .planner-balance-prism { opacity: .83; }
+.planner-balance .planner-balance-prism .planner-balance-shine { stroke: #fffaed; stroke-width: .9; opacity: .75; }
+.planner-balance .planner-balance-prism .planner-balance-edge-light { stroke: #fff6e5; stroke-width: 1; opacity: .5; }
+.planner-balance .planner-balance-opening { stroke: #716675; stroke-width: .8; stroke-dasharray: 3 3; opacity: .48; }
+.planner-balance .planner-balance-cell.is-focused .planner-balance-opening { opacity: .8; }
+.planner-balance .planner-balance-deficit { fill: #9c4333; font-family: inherit; font-size: 10px; font-weight: 600; letter-spacing: .5px; }
+.planner-balance .planner-balance-unknown { fill: #6f7066; font-family: inherit; font-size: 10px; }
+.planner-balance .planner-balance-cell .planner-balance-name { display: inline-flex; align-items: center; gap: 6px; min-height: 19px; font-size: 12px; color: #646257; line-height: 1.4; }
+.planner-balance .planner-balance-name > i { width: 5px; height: 5px; flex-shrink: 0; background: var(--planner-column-color); border-radius: 50%; }
+.planner-balance .planner-balance-cell .planner-balance-value { display: block; font-family: inherit; font-size: clamp(17px, 1.75vw, 24px); font-weight: 450; line-height: 1.25; color: #24231f; letter-spacing: -.65px; margin-top: 7px; max-width: 100%; overflow-wrap: anywhere; }
+.planner-balance .planner-balance-cell .planner-balance-change { display: block; min-height: 33px; margin-top: 7px; font-size: 11px; color: #757266; line-height: 1.5; }
+.planner-balance .planner-balance-cell.is-deficit .planner-balance-value { color: #a14635; }
+.planner-balance .planner-balance-cell .planner-balance-change.is-favourable { color: #457357; }
+.planner-balance .planner-balance-cell .planner-balance-change.is-unfavourable { color: #a14635; }
+.planner-balance .planner-balance-cell.is-unknown .planner-balance-value { color: #74776a; font-size: 18px; }
+.planner-balance .planner-balance-key { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px 14px; margin-top: 13px; color: #777669; font-size: 11px; line-height: 1.5; }
+.planner-balance .planner-balance-key > span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+.planner-balance .planner-balance-key i { width: 16px; border-top: 1px dashed #716675; }
+.planner-balance .planner-balance-inspect { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; min-height: 53px; padding: 14px 0 0; margin-top: 17px; border-top: 1px solid #deddd3; color: #636157; font-size: 12px; line-height: 1.5; }
+.planner-balance .planner-balance-inspect .planner-balance-inspect-name { color: #322b3a; font-weight: 550; }
+.planner-balance .planner-balance-inspect > span:nth-child(2) > span { color: #98859f; padding-inline: 3px; }
+.planner-balance .planner-balance-inspect strong { font-weight: 500; color: #322b3a; }
+.planner-balance .planner-balance-inspect-change { margin-left: auto; color: #775785; }
+
+@media (max-width: 650px) {
+  .planner-balance { margin-top: 22px; }
+  .planner-balance .planner-balance-scale { flex-direction: column; gap: 3px; }
+  .planner-balance .planner-balance-scale > span:last-child { text-align: left; }
+  .planner-balance .planner-balance-stage { grid-template-columns: repeat(var(--planner-mobile-column-count, 2), minmax(0, 1fr)); }
+  .planner-balance .planner-balance-cell { padding-inline: 3px; padding-bottom: 11px; }
+  .planner-balance .planner-balance-column { width: calc(100% + 6px); height: auto; }
+  .planner-balance .planner-balance-cell .planner-balance-name { font-size: 11px; gap: 4px; }
+  .planner-balance .planner-balance-cell .planner-balance-value { font-size: 15px; letter-spacing: -.65px; margin-top: 6px; }
+  .planner-balance .planner-balance-cell .planner-balance-change { font-size: 10px; line-height: 1.5; margin-top: 5px; min-height: 30px; }
+  .planner-balance .planner-balance-cell.is-unknown .planner-balance-value { font-size: 14px; }
+  .planner-balance .planner-balance-name > i { width: 4px; height: 4px; }
+  .planner-balance .planner-balance-key { font-size: 10px; }
+  .planner-balance .planner-balance-inspect { font-size: 11px; gap: 7px 12px; margin-top: 13px; }
+  .planner-balance .planner-balance-inspect-change { margin-left: 0; width: 100%; }
+}
+
+.planner-balance[data-motion="off"] .planner-balance-cell,
+.planner-balance[data-motion="off"] .planner-balance-prism path { transition: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .planner-balance .planner-balance-cell, .planner-balance .planner-balance-prism path { transition: none; }
+}

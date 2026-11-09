@@ -1,0 +1,21 @@
+.asset-purchases{display:grid;gap:18px;margin-bottom:24px}
+.asset-purchase-card{padding:28px 32px}
+.asset-purchase-heading{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.asset-purchase-heading h2{font-size:24px;margin:8px 0 0}
+.asset-purchase-heading .eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.asset-purchase-badge{border:1px solid rgba(160,225,209,.3);border-radius:99px;padding:7px 12px;font-size:12px;color:var(--accent-text, var(--accent))}
+.asset-purchase-amount{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-top:27px}
+.asset-purchase-amount strong{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.05em}
+.asset-purchase-amount span,.asset-purchase-facts,.asset-purchase-accounting{color:var(--muted);font-size:13px}
+.asset-purchase-track{height:8px;overflow:hidden;background:rgba(170,180,211,.14);border-radius:5px;margin:19px 0 12px}
+.asset-purchase-track span{display:block;height:100%;background:linear-gradient(90deg,#aedfd5,#ada1dc);border-radius:inherit}
+.asset-purchase-facts{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.asset-purchase-accounting{line-height:1.6;margin:18px 0}
+.asset-purchase-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:20px}
+.asset-purchase-actions .text-button{display:inline-flex;align-items:center;gap:8px;text-align:left}
+.asset-purchase-notes{font-size:13px;color:var(--muted);margin:14px 0}
+.asset-purchase-notes summary{cursor:pointer;color:var(--text);padding:4px 0}
+.asset-purchase-notes p{line-height:1.6;white-space:pre-wrap}
+.asset-purchase-notes ul{list-style:none;padding:0}
+.asset-purchase-notes li{display:flex;gap:14px;justify-content:space-between;padding:9px 0;border-top:1px solid rgba(175,185,210,.15)}
+@media(max-width:620px){.asset-purchase-card{padding:22px 18px}.asset-purchase-heading{align-items:flex-start;flex-direction:column}.asset-purchase-heading h2{font-size:21px}.asset-purchase-facts{flex-direction:column}.asset-purchase-actions{gap:12px}.asset-purchase-actions .text-button{font-size:12px}.asset-purchase-notes li{flex-wrap:wrap}}

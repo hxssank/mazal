@@ -1,0 +1,19 @@
+.debt-priority,.debt-research{padding:24px 28px;min-width:0;color:var(--text,#dbe7f5)}
+.debt-priority h2,.debt-research h2{font-size:18px;font-weight:600;margin:0}
+.debt-priority p,.debt-research p,.debt-research li{font-size:13px;line-height:1.65;margin-top:10px;overflow-wrap:anywhere}
+.debt-priority ol{margin:18px 0;padding-left:24px;display:grid;gap:14px}
+.debt-priority li{padding-left:5px}
+.debt-priority li button{font-size:13px;text-align:left;overflow-wrap:anywhere}
+.debt-priority li>span{display:inline-block;margin-left:12px;font-size:12px;font-variant-numeric:tabular-nums}
+.debt-priority li>small{display:block;margin-top:5px;font-size:12px;color:var(--muted,#a1b2c8)}
+.debt-research-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.debt-research-heading>span,.debt-research-note{color:var(--muted,#a1b2c8);font-size:11px!important}
+.debt-research-findings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:22px}
+.debt-research-findings article{border-top:1px solid var(--line,#d5e5ff24);padding-top:15px;min-width:0}
+.debt-research-findings h3{font-size:14px;line-height:1.5;font-weight:600;margin:0}
+.debt-research-sources{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px}
+.debt-research-sources a{font-size:11px;text-decoration:underline;text-underline-offset:3px;color:inherit}
+.debt-research details{margin-top:22px;border-top:1px solid var(--line,#d5e5ff24);padding-top:16px}
+.debt-research summary{font-size:13px;cursor:pointer}
+.debt-research details ul{padding-left:20px;margin-bottom:0}
+@media(max-width:650px){.debt-priority,.debt-research{padding:21px 18px}.debt-research-findings{grid-template-columns:1fr;gap:18px}.debt-priority li>span{display:block;margin:5px 0 0}.debt-priority p,.debt-research p,.debt-research li{font-size:12px}}

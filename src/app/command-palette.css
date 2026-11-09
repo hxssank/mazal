@@ -1,0 +1,41 @@
+.workspace-theme.daily-workspace.organized-workspace .toolbar-actions { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.workspace-theme.daily-workspace.organized-workspace .workspace-search { display: flex; align-items: center; gap: 9px; min-height: 36px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); background: var(--panel); font-size: 12px; }
+.workspace-theme.daily-workspace.organized-workspace .workspace-search:hover { background: var(--panel2); color: var(--text); border-color: var(--accent-text); }
+.workspace-search kbd { margin-left: 20px; font: inherit; font-size: 10px; opacity: .8; }
+.workspace-theme.daily-workspace.organized-workspace .command-palette { width: min(580px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); margin: min(14vh, 120px) auto auto; padding: 0; border: 1px solid #3a475e; border-radius: 18px; color: var(--text); background: var(--panel); box-shadow: 0 32px 110px #0009; overflow: hidden; color-scheme: dark; }
+.workspace-theme.daily-workspace.organized-workspace .command-palette::backdrop { background: #040711b8; backdrop-filter: blur(5px); }
+.command-palette-body { display: flex; flex-direction: column; max-height: min(620px, calc(86dvh - 32px)); }
+.command-search { display: flex; align-items: center; gap: 13px; padding: 16px 18px; border-bottom: 1px solid var(--line); color: var(--muted); }
+.workspace-theme.daily-workspace.organized-workspace .command-search input { width: 100%; min-width: 0; padding: 8px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: 16px; outline: none; }
+.command-search:focus-within { box-shadow: inset 0 -2px var(--accent-text); }
+.command-search > svg { flex-shrink: 0; }
+.command-close { display: grid; place-items: center; flex-shrink: 0; width: 32px; height: 32px; color: var(--muted); background: transparent; border-radius: 7px; }
+.command-close:hover { color: var(--text); background: var(--panel2); }
+.command-results { overflow-y: auto; overscroll-behavior: contain; padding: 8px; scrollbar-color: #42516b transparent; }
+.command-group { margin: 0; padding: 12px 12px 7px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .9px; }
+.command-result { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 12px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--muted); text-align: left; }
+.command-result[aria-selected=true] { border-color: #4c88d74d; background: #619fff18; color: var(--accent-text); }
+.command-result-icon { display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
+.command-result-copy { display: grid; gap: 5px; flex: 1; min-width: 0; }
+.command-result-copy strong { font-size: 13px; font-weight: 550; }
+.command-result-copy small { font-size: 11px; line-height: 1.4; }
+.command-empty { display: grid; justify-items: center; gap: 12px; padding: 38px 20px; text-align: center; color: var(--muted); }
+.command-empty strong { font-size: 15px; }
+.command-empty p { font-size: 12px; margin: 0 0 4px; }
+.command-footer { display: flex; flex-shrink: 0; justify-content: space-between; gap: 15px; padding: 12px 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+.command-footer span { display: flex; align-items: center; gap: 5px; }
+.command-footer kbd { display: inline-grid; place-items: center; min-width: 19px; height: 20px; padding: 0 4px; border: 1px solid var(--line); border-radius: 4px; font: inherit; color: var(--text); }
+@media (max-width: 1000px) {
+  .workspace-theme.daily-workspace.organized-workspace .workspace-search { width: 36px; justify-content: center; padding: 8px; }
+  .workspace-search :is(span,kbd) { display: none; }
+}
+@media (max-width: 480px) {
+  .workspace-theme.daily-workspace.organized-workspace .toolbar-actions { gap: 8px; }
+  .workspace-theme.daily-workspace.organized-workspace .glass-toolbar { gap: 8px; }
+  .workspace-theme.daily-workspace.organized-workspace .command-palette { margin-top: 16px; width: calc(100vw - 20px); }
+  .command-palette-body { max-height: calc(100dvh - 32px); }
+  .command-search { gap: 9px; padding: 12px; }
+  .workspace-theme.daily-workspace.organized-workspace .command-search input { font-size: 16px; }
+  .command-result { padding: 10px 8px; }
+  .command-footer { padding-inline: 12px; }
+}

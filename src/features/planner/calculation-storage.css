@@ -1,0 +1,17 @@
+.calculation-storage { min-width: 0; border-top: 1px solid var(--border, #ddd); margin-top: 1rem; padding-top: 1rem; }
+.calculation-storage-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.calculation-storage-heading h3, .calculation-storage h4 { margin: 0; }
+.calculation-storage > p { font-size: .85rem; line-height: 1.5; }
+.calculation-storage-totals, .calculation-storage-archive p { display: grid; gap: .25rem; }
+.calculation-storage-runs { max-height: 17rem; overflow: auto; border: 1px solid var(--border, #ddd); border-radius: 8px; }
+.calculation-storage .calculation-storage-run { display: flex; align-items: center; gap: .65rem; padding: .7rem; border-bottom: 1px solid var(--border, #ddd); font-size: .8rem; }
+.calculation-storage-run:last-child { border-bottom: 0; }
+.calculation-storage .calculation-storage-run input { flex: 0 0 auto; width: 1.1rem; height: 1.1rem; margin: 0; }
+.calculation-storage-run > span:nth-child(2) { display: grid; gap: .2rem; flex: 1; min-width: 0; }
+.calculation-storage-run > span:last-child { white-space: nowrap; }
+.calculation-storage small { overflow-wrap: anywhere; font-size: .7rem; opacity: .8; }
+.calculation-storage-archives { margin-top: 1rem; }
+.calculation-storage-archive { padding: .75rem 0; border-bottom: 1px solid var(--border, #ddd); }
+.calculation-storage-archive p { font-size: .8rem; line-height: 1.4; margin: 0 0 .5rem; }
+.calculation-storage-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.calculation-storage .button { max-width: 100%; white-space: normal; }

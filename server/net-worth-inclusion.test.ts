@@ -1,0 +1,50 @@
+import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { test } from 'node:test';
+import { summarize } from '../shared/analytics.ts';
+import { createStore } from './store.ts';
+
+test('net worth exclusion survives reopening and restore without changing debt or payments', t => {
+  const directory = mkdtempSync(join(tmpdir(), 'mazal-net-worth-'));
+  const path = join(directory, 'live.sqlite');
+  let store = createStore(path, 'live');
+  t.after(() => { store.close(); rmSync(directory, { recursive: true, force: true }); });
+  const added = store.command({ type: 'add_account', entityId: 'personal', name: 'Student loan', accountType: 'debt', openingBalanceCents: 1200000, openingDate: '2026-01-01' });
+  const accountId = added.accounts[0].id;
+  const before = store.command({ type: 'add_obligation', entityId: 'personal', name: 'Loan payment', amountCents: 10000, dueDate: '2026-01-15', direction: 'out', recurrence: 'monthly', accountId, category: 'Debt' });
+  const command = { type: 'set_net_worth_inclusion' as const, accountId, included: false, requestId: 'exclude-student-loan', expectedRevision: before.revision };
+  const hidden = store.command(command);
+  assert.equal(hidden.accounts[0].excludeFromNetWorth, true);
+  assert.equal(hidden.accounts[0].balanceCents, 1200000);
+  assert.deepEqual(hidden.transactions, before.transactions);
+  assert.deepEqual(hidden.obligations, before.obligations);
+  assert.deepEqual(summarize(hidden), summarize(before));
+  assert.deepEqual(store.command(command), hidden);
+  const backup = store.export();
+  store.close();
+  store = createStore(path, 'live');
+  assert.equal(store.state().accounts[0].excludeFromNetWorth, true);
+  const restored = store.restore(backup, store.state().revision);
+  assert.equal(restored.accounts[0].excludeFromNetWorth, true);
+  const shown = store.command({ ...command, included: true, requestId: 'include-student-loan', expectedRevision: restored.revision });
+  assert.equal(shown.accounts[0].excludeFromNetWorth, false);
+  assert.deepEqual(shown.transactions, before.transactions);
+  assert.deepEqual(shown.obligations, before.obligations);
+  assert.deepEqual(summarize(shown), summarize(before));
+});
+
+test('invalid or stale net worth changes leave the records unchanged', t => {
+  const directory = mkdtempSync(join(tmpdir(), 'mazal-net-worth-invalid-'));
+  const store = createStore(join(directory, 'live.sqlite'), 'live');
+  t.after(() => { store.close(); rmSync(directory, { recursive: true, force: true }); });
+  const before = store.command({ type: 'add_account', entityId: 'personal', name: 'Loan', accountType: 'debt', openingBalanceCents: 10000, openingDate: '2026-01-01' });
+  const command = { type: 'set_net_worth_inclusion' as const, accountId: before.accounts[0].id, included: false, requestId: 'exclude-loan', expectedRevision: before.revision };
+  assert.throws(() => store.command({ ...command, expectedRevision: undefined }), /current workspace revision/);
+  assert.throws(() => store.command({ ...command, expectedRevision: before.revision - 1 }), /changed|refresh/i);
+  assert.throws(() => store.command({ ...command, requestId: '' }), /Request ID/);
+  assert.throws(() => store.command({ ...command, included: 'no' } as never), /whether/);
+  assert.throws(() => store.command({ ...command, accountId: 'personal:equity' }), /existing account/);
+  assert.deepEqual(store.state(), before);
+});

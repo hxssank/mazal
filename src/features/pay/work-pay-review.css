@@ -1,0 +1,132 @@
+.pay-review-start { display: grid; grid-template-columns: minmax(0, 1.55fr) repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 27px; }
+.pay-review-latest, .pay-review-shortcut { position: relative; min-width: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--glass-fill); padding: 24px; }
+.pay-review-latest { --text: #f2fcff; --muted: #ddf6ff; --accent-text: #a4f5ff; --line: #a4ddff3b; border-color: #87d7f770; background: radial-gradient(ellipse at 0 0, #39e8f02b, transparent 65%), linear-gradient(125deg, #086884b3, #2330a8b3); }
+.pay-review-latest > header { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+.pay-review-icon { display: inline-grid; place-items: center; width: 30px; height: 30px; border: 1px solid #c9faff4d; border-radius: 9px; background: linear-gradient(145deg, #17cce66b, #2375de40); color: #d4ffff; box-shadow: inset 0 1px 0 #ffffff42; }
+.pay-review-workspace .pay-review-latest h2 { font-size: 14px; font-weight: 500; letter-spacing: 0; }
+.pay-review-latest header time { margin-left: auto; color: var(--muted); font-size: 12px; }
+.pay-review-latest-amount { display: block; margin-top: 21px; color: var(--text); font-size: clamp(29px, 3.2vw, 43px); font-weight: 500; line-height: 1.1; letter-spacing: -1.4px; font-variant-numeric: tabular-nums; }
+.pay-review-latest-caption { display: block; margin-top: 9px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.pay-review-receipt { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 15px; }
+.pay-review-receipt > span { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; }
+.pay-review-receipt > span > i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pay-review-receipt.confirmed > span { color: var(--accent-text, var(--accent)); }
+.pay-review-receipt.matched > span { color: #b5c9e7; }
+.pay-review-receipt.ambiguous > span { color: #e4bd8c; }
+.pay-review-workspace .pay-review-receipt p { margin-top: 7px; color: var(--muted); font-size: 12px; line-height: 1.65; max-width: 440px; }
+.pay-review-latest > .text-button { display: inline-flex; align-items: center; gap: 10px; min-height: 36px; margin-top: 12px; font-size: 13px; }
+.pay-review-shortcut { display: flex; flex-direction: column; color: var(--text); text-align: left; }
+.pay-review-shortcut.needs-review { background: radial-gradient(ellipse at 0 0, #e5a22b2b, transparent 68%), var(--glass-fill); }
+.pay-review-shortcut:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); background-color: var(--panel2); }
+.pay-review-shortcut:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.pay-review-shortcut-label { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.pay-review-shortcut-label svg:last-child { margin-left: auto; opacity: .6; }
+.pay-review-shortcut.needs-review .pay-review-shortcut-label svg:first-child { color: #e4bd8c; }
+.pay-review-shortcut > strong { display: flex; flex-wrap: wrap; align-items: baseline; gap: 9px; margin-top: 24px; font-size: 37px; font-weight: 500; line-height: 1.1; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.pay-review-shortcut > strong > small { color: var(--muted); font-size: 12px; font-weight: 400; letter-spacing: 0; }
+.pay-review-workspace .pay-review-shortcut p { margin-top: 14px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.pay-review-shortcut-action { display: flex; align-items: center; gap: 8px; padding-top: 18px; margin-top: auto; color: var(--accent-text, var(--accent)); font-size: 13px; }
+.pay-review-shortcut-action svg { margin-left: auto; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-toolbar { align-items: center; gap: 14px; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-nav { margin-bottom: 0; }
+.pay-review-period-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 20px; margin: 0 0 20px; padding: 14px 17px; border: 1px solid var(--line); border-radius: 14px; background: var(--glass-fill); }
+.pay-review-period-controls > div, .pay-review-queue-filter { display: flex; flex-wrap: wrap; gap: 5px; }
+.pay-review-period-controls button, .pay-review-queue-filter button { min-height: 40px; padding: 9px 12px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--muted); font-size: 13px; }
+.pay-review-period-controls button[aria-pressed=true], .pay-review-queue-filter button[aria-pressed=true] { color: var(--accent-text, var(--accent)); background: color-mix(in srgb, var(--accent) 12%, transparent); border-color: color-mix(in srgb, var(--accent) 25%, transparent); }
+.pay-review-period-controls button:hover:not([aria-pressed=true]), .pay-review-queue-filter button:hover:not([aria-pressed=true]) { color: var(--text); background: var(--panel2); }
+.pay-review-period-controls > label { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 12px; }
+.pay-review-period-controls > span { margin-left: auto; font-size: 12px; color: var(--muted); }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-period { margin-bottom: 17px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-overview { border-radius: 18px; grid-template-columns: 1.35fr repeat(3, minmax(0, 1fr)); margin-bottom: 19px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-net { padding: 23px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-net > strong { font-size: clamp(26px, 2.7vw, 34px); }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-total { padding: 22px; gap: 9px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-total strong { font-size: clamp(19px, 2vw, 25px); }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-trend { border-radius: 15px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-records { grid-template-columns: minmax(280px, .82fr) minmax(0, 1.45fr); gap: 25px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-history > header { margin: 3px 0 16px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-history-list { max-height: 780px; overflow-y: auto; overscroll-behavior: contain; border-radius: 15px; scrollbar-width: thin; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-history-row { padding: 18px 20px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-history-row.selected { background: linear-gradient(110deg, #187bdd38, #27bec01a); border-left-color: #46ceff; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-history-row:hover { background: #75b9f01a; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-detail { padding: 24px; border-radius: 18px; background: var(--glass-fill); border-color: color-mix(in srgb, var(--accent) 22%, var(--line)); }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-detail-net { padding: 18px; background: linear-gradient(110deg, #168dc029, #275e9b26); border: 1px solid var(--line); border-radius: 12px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-metadata { gap: 20px 28px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-hours > header { margin-bottom: 21px; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-hours-note { padding: 18px 20px; border-radius: 12px; border: 1px solid #d4bb8833; background: #d4bb8808; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-hour-filters { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--glass-fill); }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-timecard-group { padding: 23px 25px 12px; border-radius: 17px; background: var(--glass-fill); }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-review-heading { margin-bottom: 18px; }
+.pay-review-queue-filter { margin-bottom: 22px; }
+.pay-review-queue-filter button span { margin-left: 7px; font-variant-numeric: tabular-nums; opacity: .8; }
+.pay-review-clear { display: flex; flex-wrap: wrap; align-items: center; gap: 13px; margin-bottom: 18px; padding: 21px; border: 1px solid var(--line); border-radius: 14px; background: var(--glass-fill); color: var(--accent-text, var(--accent)); }
+.pay-review-workspace .pay-review-clear p { flex: 1; min-width: 200px; font-size: 12px; line-height: 1.7; color: var(--muted); }
+.pay-review-clear .text-button { display: flex; gap: 10px; align-items: center; }
+.pay-bank-coverage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(110px, .45fr) auto; align-items: center; gap: 20px; margin-bottom: 22px; padding: 19px 22px; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(115deg, #218ba015, transparent), var(--glass-fill); }
+.pay-bank-coverage-copy { min-width: 0; }
+.pay-bank-coverage-copy > span { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.pay-review-workspace .pay-bank-coverage-copy > h3 { margin: 9px 0 0; color: var(--text); font-size: 15px; font-weight: 500; letter-spacing: -.2px; }
+.pay-review-workspace .pay-bank-coverage-copy > p { margin: 7px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.pay-bank-coverage-meter { height: 6px; overflow: hidden; border-radius: 5px; background: #bed7ff19; }
+.pay-bank-coverage-meter > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #309be8, #6cdcc7); }
+.pay-bank-coverage > .text-button { display: flex; align-items: center; gap: 9px; min-height: 38px; font-size: 12px; }
+[data-motion=on] .pay-bank-coverage-meter > span { transition: width 450ms ease; }
+[data-motion=on] .work-pay-composition > span { transition: flex-grow 450ms ease; }
+[data-motion=on] .work-pay-bar-stack { transition: height 400ms ease; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-issues { gap: 18px; align-items: start; border-top: 0; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-issue { padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: var(--glass-fill); }
+.pay-review-workspace .work-pay-issue[hidden] { display: none; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-issue.review:not(.resolved) { border-color: #d4bb8833; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-issue-kind { display: inline-flex; padding: 4px 8px; border-radius: 5px; background: #d4bb8810; }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-issue-links { padding-top: 15px; border-top: 1px solid var(--line); }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-sources { padding-top: 25px; border-top: 1px solid var(--line); }
+.app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-source-batch { padding: 21px; border: 1px solid var(--line); border-radius: 15px; background: var(--glass-fill); }
+[data-motion=on] .pay-review-shortcut { transition: transform 220ms ease, border-color 220ms ease, background-color 220ms ease; }
+[data-motion=on] .pay-review-shortcut:hover { transform: translateY(-3px); }
+[data-motion=on] .pay-review-latest-amount, [data-motion=on] .pay-review-shortcut > strong { animation: pay-review-value 320ms ease-out; }
+[data-motion=on] .pay-review-workspace :is(.work-pay-section, .work-pay-hours, .work-pay-review) { animation: pay-review-enter 320ms ease-out; }
+[data-motion=on] .pay-review-workspace :is(.work-pay-history-row, .pay-review-period-controls button, .pay-review-queue-filter button) { transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease; }
+@keyframes pay-review-enter { from { opacity: .4; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes pay-review-value { from { opacity: .4; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+@media (max-width: 1100px) {
+  .pay-review-start { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+  .pay-review-latest { grid-row: span 2; }
+  .pay-review-shortcut { padding: 18px 20px; }
+  .pay-review-shortcut > strong { margin-top: 15px; font-size: 30px; }
+  .pay-review-shortcut-action { display: none; }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-overview { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-net { grid-column: 1 / -1; border-bottom: 1px solid var(--line); }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-total:first-of-type { border-left: 0; }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-records { grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr); gap: 18px; }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-detail { padding: 21px; }
+}
+@media (max-width: 800px) {
+  .pay-bank-coverage { grid-template-columns: minmax(0, 1fr) auto; gap: 14px 20px; }
+  .pay-bank-coverage-copy { grid-column: 1 / -1; }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-records { grid-template-columns: minmax(0, 1fr); }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-history-list { max-height: 420px; }
+  .pay-review-period-controls > span { margin-left: 0; }
+}
+@media (max-width: 600px) {
+  .pay-bank-coverage { grid-template-columns: minmax(0, 1fr); padding: 18px; gap: 14px; }
+  .pay-bank-coverage > .text-button { justify-content: space-between; }
+  .pay-review-start { grid-template-columns: minmax(0, 1fr); }
+  .pay-review-latest { grid-row: auto; padding: 20px; }
+  .pay-review-shortcut { display: grid; grid-template-columns: 1fr auto; gap: 9px 15px; }
+  .pay-review-shortcut-label { grid-column: 1; }
+  .pay-review-shortcut-label svg:last-child { display: none; }
+  .pay-review-shortcut > strong { grid-column: 2; grid-row: 1 / 3; margin: 0; align-self: center; }
+  .pay-review-shortcut > strong small { display: none; }
+  .pay-review-workspace .pay-review-shortcut p { grid-column: 1; margin: 0; font-size: 12px; }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-total { padding: 15px; }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-total strong { font-size: 18px; }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-total small { font-size: 12px; }
+  .pay-review-period-controls { padding: 13px; }
+  .pay-review-period-controls button { padding-inline: 9px; }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-timecard-group { padding: 18px 16px 10px; }
+  .app-shell.workspace-theme.daily-workspace .pay-review-workspace .work-pay-issue { padding: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pay-review-workspace *, .pay-review-workspace *::before, .pay-review-workspace *::after { animation: none !important; transition: none !important; }
+  .pay-review-shortcut:hover { transform: none !important; }
+}

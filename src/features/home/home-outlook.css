@@ -1,0 +1,33 @@
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #638bc264;
+  border-radius: 18px;
+  background: #18283e;
+  box-shadow: none;
+}
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-heading h2 { margin: 0; color: #c4d5ed; font-size: 14px; font-weight: 500; line-height: 1.45; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-heading > svg { flex-shrink: 0; color: #9fcaff; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-value { margin-top: 16px; color: #edf2fa; font-size: clamp(32px, 3.5vw, 44px); font-weight: 550; font-variant-numeric: tabular-nums; letter-spacing: -1.4px; line-height: 1.1; overflow-wrap: anywhere; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-value.is-negative { color: var(--danger); }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-period { margin: 8px 0 12px; color: #b6c5d9; font-size: 13px; line-height: 1.5; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-period time { color: inherit; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-status { display: flex; align-items: center; align-self: flex-start; gap: 6px; color: #b6c5d9; font-size: 12px; line-height: 1.5; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-status.is-partial { color: var(--warning); }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-note { margin: 6px 0 14px; color: #b6c5d9; font-size: 12px; line-height: 1.5; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-risk { margin: 0 0 12px; color: var(--warning); font-size: 12px; line-height: 1.5; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook.has-shortfall { border-color: #b58a4b99; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook-details { justify-content: space-between; width: 100%; min-height: 42px; margin-top: auto; padding: 10px 0 0; border-top: 1px solid var(--line); }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-payment-total { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 8px 0; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-payment-total > strong { color: var(--text); font-size: 22px; font-weight: 550; font-variant-numeric: tabular-nums; letter-spacing: -.5px; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-payment-total > span { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-payment-unknown { color: var(--warning); }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-payment-date:is(.is-overdue, .is-today) { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; line-height: 1.5; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-payment-date.is-overdue { color: #f1cd91; background: #6c471e66; }
+.workspace-theme.daily-workspace.organized-workspace .home-organized .home-payment-date.is-today { color: #b8d6ff; background: #31548066; }
+@media (max-width: 760px) {
+  .workspace-theme.daily-workspace.organized-workspace .home-organized .home-outlook { padding: 20px; }
+}

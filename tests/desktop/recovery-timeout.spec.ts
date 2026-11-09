@@ -1,0 +1,191 @@
+import { createHash } from 'node:crypto';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { gzipSync } from 'node:zlib';
+import { expect, test } from '@playwright/test';
+import { createDocumentStore } from '../../server/documents.ts';
+import type { AppState } from '../../shared/types.ts';
+
+function originalArchive(marker = 'timeout') {
+  const directory = mkdtempSync(join(tmpdir(), 'mazal-browser-archive-'));
+  const documents = createDocumentStore(directory);
+  try {
+    documents.upload(Buffer.from(`%PDF-1.4\nIsolated recovery ${marker} original.\n`), { originalName: `Recovery ${marker} original.pdf`, accountId: 'previous-account', kind: 'statement' });
+    return gzipSync(Buffer.concat([...documents.export()]));
+  } finally { documents.close(); rmSync(directory, { recursive: true, force: true }); }
+}
+
+test('a stalled recovery check can retry without closing the backup dialog', async ({ page, request }) => {
+  const response = await request.get('/api/state?workspace=live');
+  expect(response.headers()['x-mazal-data-source']).toBe('sample');
+  const before = await response.json();
+  let reads = 0;
+  await page.route('**/api/documents/recovery?workspace=live', () => { reads++; });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.clock.install();
+  await page.goto('/?setup=restore#documents/files');
+  const dialog = page.getByRole('dialog', { name: 'Backups and data', exact: true });
+  const recovery = dialog.locator('.document-recovery');
+  await expect.poll(() => reads).toBe(1);
+  const file = recovery.getByLabel('Original-file archive (.tar.gz)', { exact: true });
+  await file.focus();
+  await page.clock.fastForward(15_001);
+  await expect(recovery.getByRole('alert').filter({ hasText: /timed out/i })).toBeVisible();
+  await expect(file).toBeFocused();
+  const retry = recovery.getByRole('button', { name: 'Check recovery again', exact: true });
+  await expect(retry).toBeEnabled();
+  await page.unroute('**/api/documents/recovery?workspace=live');
+  await retry.focus();
+  await page.keyboard.press('Enter');
+  await expect(recovery.getByText('All saved originals and statement sources passed their hash checks. Every assigned account link exists.', { exact: true })).toBeVisible();
+  await expect(retry).toBeFocused();
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'Home', exact: true }).click();
+  await page.goBack();
+  await expect(page).toHaveURL(/#documents\/files$/);
+  await expect(page.getByRole('heading', { name: 'Statements', exact: true, level: 1 })).toBeFocused();
+  expect(await (await request.get('/api/state?workspace=live')).json()).toEqual(before);
+});
+
+test('preview and discard timeouts retain the archive and chosen account until explicit retry succeeds', async ({ page, request }) => {
+  const response = await request.get('/api/state?workspace=live');
+  expect(response.headers()['x-mazal-data-source']).toBe('sample');
+  const before = await response.json() as AppState;
+  const libraryBefore = await (await request.get('/api/documents?workspace=live')).json();
+  const archive = originalArchive();
+  const uploads: (Buffer | null)[] = [];
+  const discarded: string[] = [];
+  const commits: string[] = [];
+  await page.route('**/api/documents/restore/preview?workspace=live', async route => {
+    uploads.push(route.request().postDataBuffer());
+    if (uploads.length > 1) await route.continue();
+  });
+  await page.route('**/api/documents/restore/preview?workspace=live&token=*', async route => {
+    discarded.push(route.request().url());
+    if (discarded.length === 1) {
+      expect((await route.fetch()).status()).toBe(200);
+      return;
+    }
+    await route.continue();
+  });
+  page.on('request', request => { if (new URL(request.url()).pathname === '/api/documents/restore/commit') commits.push(request.url()); });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.clock.install();
+  await page.goto('/?setup=restore#documents/files');
+  const dialog = page.getByRole('dialog', { name: 'Backups and data', exact: true });
+  const recovery = dialog.locator('.document-recovery');
+  const file = recovery.getByLabel('Original-file archive (.tar.gz)', { exact: true });
+  await file.setInputFiles({ name: 'recovery-originals.tar.gz', mimeType: 'application/gzip', buffer: archive });
+  await recovery.getByRole('button', { name: 'Verify archive', exact: true }).focus();
+  await page.keyboard.press('Enter');
+  await expect.poll(() => uploads.length).toBe(1);
+  await expect(dialog.getByRole('button', { name: 'Done', exact: true })).toBeDisabled();
+  await page.clock.fastForward(180_001);
+  await expect(recovery.getByRole('alert').filter({ hasText: /timed out/i })).toBeVisible();
+  await expect(recovery.getByRole('alert').filter({ hasText: /timed out/i })).toBeFocused();
+  await expect(dialog.getByRole('button', { name: 'Done', exact: true })).toBeEnabled();
+  expect(await file.evaluate((input: HTMLInputElement) => input.files?.[0]?.name)).toBe('recovery-originals.tar.gz');
+  expect(Buffer.from(await file.evaluate(async (input: HTMLInputElement) => Array.from(new Uint8Array(await input.files![0].arrayBuffer()))))).toEqual(archive);
+  await file.focus();
+  await page.keyboard.press('Escape');
+  await expect(dialog.getByRole('button', { name: 'Keep editing', exact: true })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(file).toBeFocused();
+  const verified = page.waitForResponse(response => new URL(response.url()).pathname === '/api/documents/restore/preview' && response.request().method() === 'POST' && response.status() === 200);
+  await recovery.getByRole('button', { name: 'Verify archive', exact: true }).click();
+  expect((await (await verified).json()).archiveSha256).toBe(createHash('sha256').update(archive).digest('hex'));
+  const account = recovery.getByLabel('Account for Recovery timeout original.pdf', { exact: true });
+  await expect(account).toBeVisible();
+  const cash = before.accounts.find(account => account.name === 'Browser test cash')!;
+  await account.selectOption(cash.id);
+  await recovery.getByRole('button', { name: 'Clear archive', exact: true }).focus();
+  await page.keyboard.press('Enter');
+  await expect.poll(() => discarded.length).toBe(1);
+  await page.clock.fastForward(60_001);
+  await expect(recovery.getByRole('alert').filter({ hasText: /timed out/i })).toBeVisible();
+  await expect(recovery.getByRole('alert').filter({ hasText: /timed out/i })).toBeFocused();
+  await expect(account).toHaveValue(cash.id);
+  await expect(recovery.getByText('recovery-originals.tar.gz', { exact: true })).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Done', exact: true })).toBeEnabled();
+  await recovery.getByRole('button', { name: 'Clear archive', exact: true }).click();
+  await expect(account).toHaveCount(0);
+  await expect(file).toBeEnabled();
+  expect(await file.evaluate((input: HTMLInputElement) => input.files?.length)).toBe(0);
+  expect(uploads).toHaveLength(2);
+  for (const bytes of uploads) if (bytes !== null) expect(bytes).toEqual(archive);
+  expect(discarded).toHaveLength(2);
+  expect(discarded[0]).toBe(discarded[1]);
+  expect(commits).toEqual([]);
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole('dialog', { name: 'Backups and data', exact: true })).toBeVisible();
+  expect(await (await request.get('/api/state?workspace=live')).json()).toEqual(before);
+  expect((await (await request.get('/api/documents?workspace=live')).json()).documents).toEqual(libraryBefore.documents);
+});
+
+for (const savedFirst of [false, true]) test(`an original-file restore response lost ${savedFirst ? 'after' : 'before'} saving confirms the same request`, async ({ page, request }) => {
+  const response = await request.get('/api/state?workspace=live');
+  expect(response.headers()['x-mazal-data-source']).toBe('sample');
+  const before = await response.json() as AppState;
+  const libraryBefore = await (await request.get('/api/documents?workspace=live')).json();
+  const marker = `commit-${savedFirst ? 'after' : 'before'}`;
+  const archive = originalArchive(marker);
+  const commits: unknown[] = [];
+  let handled = false;
+  await page.route('**/api/documents/restore/commit?workspace=live', async route => {
+    commits.push(route.request().postDataJSON());
+    if (commits.length === 1) {
+      if (savedFirst) expect((await route.fetch()).status()).toBe(200);
+      handled = true;
+      return;
+    }
+    await route.continue();
+  });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.clock.install();
+  await page.goto('/?setup=restore#documents/files');
+  const dialog = page.getByRole('dialog', { name: 'Backups and data', exact: true });
+  const recovery = dialog.locator('.document-recovery');
+  await recovery.getByLabel('Original-file archive (.tar.gz)', { exact: true }).setInputFiles({ name: `${marker}.tar.gz`, mimeType: 'application/gzip', buffer: archive });
+  await recovery.getByRole('button', { name: 'Verify archive', exact: true }).click();
+  const account = recovery.getByLabel(`Account for Recovery ${marker} original.pdf`, { exact: true });
+  const cash = before.accounts.find(account => account.name === 'Browser test cash')!;
+  await account.selectOption(cash.id);
+  await recovery.getByLabel('I reviewed the account links. Restore these verified files.', { exact: true }).check();
+  await recovery.getByRole('button', { name: 'Restore original files', exact: true }).focus();
+  await page.keyboard.press('Enter');
+  await expect.poll(() => handled).toBe(true);
+  await page.clock.fastForward(180_001);
+  await expect(recovery.getByRole('alert').filter({ hasText: /timed out/i })).toBeVisible();
+  await expect(recovery.getByRole('alert').filter({ hasText: /timed out/i })).toBeFocused();
+  await expect(account).toBeDisabled();
+  await expect(account).toHaveValue(cash.id);
+  await expect(recovery.getByRole('button', { name: 'Clear archive', exact: true })).toBeDisabled();
+  await expect(dialog.getByRole('button', { name: 'Done', exact: true })).toBeEnabled();
+  expect(commits).toHaveLength(1);
+  const interim = await (await request.get('/api/documents?workspace=live')).json();
+  expect(interim.documents).toHaveLength(libraryBefore.documents.length + (savedFirst ? 1 : 0));
+  await page.keyboard.press('Escape');
+  await expect(dialog.getByRole('button', { name: 'Keep editing', exact: true })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(recovery.getByRole('alert').filter({ hasText: /timed out/i })).toBeFocused();
+  const confirm = recovery.getByRole('button', { name: 'Confirm original restore', exact: true });
+  await confirm.focus();
+  await page.keyboard.press('Enter');
+  await expect(recovery.getByRole('status').filter({ hasText: /1 documents restored/ })).toBeVisible();
+  expect(commits).toHaveLength(2);
+  expect(commits[1]).toEqual(commits[0]);
+  const libraryAfter = await (await request.get('/api/documents?workspace=live')).json();
+  expect(libraryAfter.documents).toHaveLength(libraryBefore.documents.length + 1);
+  const original = libraryAfter.documents.find((document: { originalName: string }) => document.originalName === `Recovery ${marker} original.pdf`);
+  expect(original.accountId).toBe(cash.id);
+  expect(await (await request.get(`/api/documents/${original.id}/content?workspace=live`)).body()).toEqual(Buffer.from(`%PDF-1.4\nIsolated recovery ${marker} original.\n`));
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await page.reload();
+  await expect(page.getByRole('dialog', { name: 'Backups and data', exact: true })).toBeVisible();
+  expect(commits).toHaveLength(2);
+  expect(await (await request.get('/api/state?workspace=live')).json()).toEqual(before);
+});

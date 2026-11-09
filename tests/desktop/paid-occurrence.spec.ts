@@ -1,0 +1,58 @@
+import { expect, test } from '@playwright/test';
+import { today } from '../../shared/analytics.ts';
+import type { AppState, Command } from '../../shared/types.ts';
+
+test('catching up an earlier bill skips an occurrence already paid in the agenda and next payment date', async ({ page, request }) => {
+  const response = await request.get('/api/state?workspace=live');
+  expect(response.headers()['x-mazal-data-source']).toBe('sample');
+  let state = await response.json() as AppState;
+  const cash = state.accounts.find(account => account.name === 'Browser test cash')!;
+  const name = 'Browser catch-up bill';
+  const asOf = today();
+  const anchor = new Date(`${asOf.slice(0, 7)}-15T12:00:00Z`);
+  if (anchor.toISOString().slice(0, 10) < asOf) anchor.setUTCMonth(anchor.getUTCMonth() + 1);
+  const occurrence = (offset: number) => {
+    const date = new Date(anchor);
+    date.setUTCMonth(date.getUTCMonth() + offset);
+    return date.toISOString().slice(0, 10);
+  };
+  const paidDate = occurrence(0), earlierDate = occurrence(-1), nextDate = occurrence(1);
+  const command = async (value: Command) => {
+    const saved = await request.post('/api/command?workspace=live', { data: { ...value, expectedRevision: state.revision } });
+    expect(saved.ok()).toBe(true);
+    state = await saved.json() as AppState;
+  };
+  await command({ type: 'add_obligation', entityId: 'personal', accountId: cash.id, name, amountCents: 5500, dueDate: paidDate, direction: 'out', recurrence: 'monthly', category: 'Bills', requestId: 'browser-catchup-add' });
+  const bill = state.obligations.find(item => item.name === name)!;
+  await command({ type: 'pay_obligation', id: bill.id, expectedDueDate: paidDate, date: asOf, requestId: 'browser-catchup-paid-later' });
+  await command({ type: 'update_obligation', id: bill.id, expectedStatus: 'planned', expectedDueDate: nextDate, name, amountCents: 5500, dueDate: earlierDate, recurrence: 'monthly', accountId: cash.id, category: 'Bills', requestId: 'browser-catchup-earlier' });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#expenses/schedule');
+  await page.getByRole('combobox', { name: 'Schedule date range' }).selectOption('90');
+  const scheduledDates = () => page.locator('.schedule-day').filter({ has: page.getByRole('heading', { name, exact: true }) }).locator('time').evaluateAll(nodes => nodes.map(node => node.getAttribute('datetime')));
+  await expect.poll(scheduledDates).toContain(nextDate);
+  expect(await scheduledDates()).not.toContain(paidDate);
+  const past = page.locator('.schedule-past');
+  await past.locator('summary').click();
+  await expect(past.getByRole('heading', { name, exact: true })).toBeVisible();
+  await past.getByRole('button', { name: `Record paid: ${name}`, exact: true }).focus();
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Record a payment', exact: true });
+  await dialog.getByRole('button', { name: 'Record payment', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Expenses', exact: true, level: 1 })).toBeFocused();
+  const after = await (await request.get('/api/state?workspace=live')).json() as AppState;
+  expect(after.obligations.find(item => item.id === bill.id)!.dueDate).toBe(nextDate);
+  expect(after.transactions.filter(item => item.plannedPayment?.obligationId === bill.id).map(item => item.plannedPayment!.dueDate).sort()).toEqual([earlierDate, paidDate].sort());
+  expect(after.accounts.find(item => item.id === cash.id)!.balanceCents).toBe(cash.balanceCents - 11_000);
+  expect(await scheduledDates()).not.toContain(paidDate);
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'Home', exact: true }).click();
+  await page.goBack();
+  await expect(page).toHaveURL(/#expenses\/schedule$/);
+  await expect(page.getByRole('heading', { name: 'Expenses', exact: true, level: 1 })).toBeFocused();
+  await page.reload();
+  await page.getByRole('combobox', { name: 'Schedule date range' }).selectOption('90');
+  await expect.poll(scheduledDates).toContain(nextDate);
+  expect(await scheduledDates()).not.toContain(paidDate);
+  expect((await (await request.get('/api/state?workspace=live')).json()).revision).toBe(after.revision);
+});

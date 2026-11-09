@@ -1,0 +1,80 @@
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(
+  .work-pay-intro > span,
+  .work-pay-period p span,
+  .work-pay-period label,
+  .work-pay-hour-filters label,
+  .work-pay-total > span,
+  .work-pay-legend,
+  .work-pay-history > header > span,
+  .work-pay-bank-status,
+  .work-pay-detail-net > span:first-child,
+  .work-pay-lines-heading > span,
+  table thead th,
+  .work-pay-ytd summary > span,
+  .work-pay-detail > footer,
+  .work-pay-hours > header > span,
+  .work-pay-timecard-group > header > span,
+  .work-pay-timecard-group table td small,
+  .work-pay-timecard-group table td a span,
+  .work-pay-import > span,
+  .work-pay-import details,
+  .work-pay-source-batch li span
+) { color: var(--muted); font-size: 12px; line-height: 1.55; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(table tbody th, .work-pay-history-row, .work-pay-bar) { color: var(--text); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(.work-pay-bank-status.matched, .work-pay-bank-status.confirmed, .pay-review-receipt.matched > span, .work-pay-timecard-status) { color: var(--green); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(.work-pay-bank-status.ambiguous, .pay-review-receipt.ambiguous > span, .work-pay-timecard-flag, .work-pay-issue-kind, .pay-review-shortcut.needs-review .pay-review-shortcut-label svg:first-child) { color: var(--warning); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-negative td { color: var(--danger); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay a:not(.button) { color: var(--accent-text); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-total { min-width: 0; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(.work-pay-total > strong, .work-pay-net > strong) { overflow-wrap: anywhere; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay { --pay-border: var(--line); --pay-muted: var(--muted); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(.pay-review-latest, .pay-review-shortcut, .pay-review-period-controls, .work-pay-history-list, .work-pay-detail, .work-pay-trend, .work-pay-hour-filters, .work-pay-timecard-group, .work-pay-issue, .work-pay-source-batch, .pay-review-clear) { border-color: var(--line); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(.work-pay-history-list, .work-pay-trend) { background: var(--glass-fill); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .pay-review-latest { border-color: #87d7f770; box-shadow: inset 0 1px 0 #e1ffff80, inset 0 -1px 0 #9bcfff21, 0 14px 36px #05396e45; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .pay-review-shortcut-label > svg:first-child { box-sizing: content-box; width: 16px; height: 16px; padding: 6px; border: 1px solid #a8d7ff42; border-radius: 9px; color: #b9ecff; background: linear-gradient(145deg, #246fe77a, #4a35aa57); box-shadow: inset 0 1px 0 #ffffff36; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .pay-review-shortcut.needs-review .pay-review-shortcut-label > svg:first-child { color: #ffe1a7; background: linear-gradient(145deg, #b879287a, #8e4b1b57); border-color: #eabf6b52; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-overview { --text: #f3f7ff; --muted: #d6def8; background: radial-gradient(ellipse at 0 0, #33c9e733, transparent 58%), linear-gradient(115deg, #164e928c, #4a2eaa99); border-color: #a4b8ff58; box-shadow: inset 0 1px 0 #ffffff58, 0 12px 34px #0c1d6338; -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-detail-net { background: linear-gradient(110deg, #058fcf38, #304bb132); border-color: #87ceff3b; box-shadow: inset 0 1px 0 #ffffff18; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-matches { background: #0bb4a019; border: 1px solid #55e0c526; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(.work-pay-kicker, .work-pay-net p, .work-pay-total small, .work-pay-history-row small, .work-pay-history-note, .work-pay-detail > header p, .work-pay-match-note, .work-pay-matches li, .work-pay-metadata dt, .work-pay-ytd-only, .work-pay-deductions > p, .work-pay-ytd > p, .work-pay-vacation > p, .work-pay-ytd-totals dt) { font-size: 12px; line-height: 1.6; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-kicker { letter-spacing: .35px; text-transform: none; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(.work-pay-metadata dd, .work-pay-deductions dl > div) { font-size: 13px; line-height: 1.6; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-metadata > div { min-width: 0; overflow-wrap: anywhere; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-nav { padding: 3px; gap: 3px; border-color: var(--line); background: #0b1c368c; border-radius: 10px; box-shadow: inset 0 1px 0 #ffffff1f; -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-nav button { min-height: 40px; padding: 9px 14px; font-size: 13px; color: var(--muted); border-radius: 7px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-nav button[aria-pressed=true] { color: #f4fcff; border-color: #81d1ff80; background: linear-gradient(125deg, #137fc9a6, #275ce2a6); box-shadow: inset 0 1px 0 #d5f5ff70, 0 3px 12px #003ea54d; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-nav button > span { font-size: 12px; color: #b3efff; background: #24a7f52e; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(select, input) { min-height: 40px; font-size: 13px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay input[type=checkbox] { min-height: 0; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-filters { gap: 10px; margin-bottom: 14px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-filters select { width: 132px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-history-row > span { min-width: 0; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-history-row > span:last-child { max-width: 45%; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-history-row strong { font-size: 15px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-matches { padding: 12px 14px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay table { font-size: 13px; line-height: 1.5; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay table :is(th, td) { padding-block: 13px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay table tbody tr:hover { background: #ffffff03; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-lines-heading { margin-bottom: 12px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-deductions dl > div { margin-top: 12px; }
+.app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay :is(.work-pay-ytd, .work-pay-vacation) > summary { min-height: 36px; font-size: 13px; }
+
+@media (max-width: 540px) {
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-overview { grid-template-columns: minmax(0, 1fr); }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-net { padding: 20px; border-bottom: 0; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-total { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 5px 12px; padding: 16px 20px; border-left: 0; border-top: 1px solid var(--line); }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-total > span { font-size: 12px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-total > strong { font-size: 20px; white-space: normal; text-align: right; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-total > small { grid-column: 1 / -1; font-size: 12px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-nav { width: 100%; flex-wrap: wrap; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-nav button { flex: 1 1 auto; padding-inline: 10px; white-space: normal; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-filters { flex-direction: column; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-filters .work-pay-search { flex: 0 1 auto; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-filters > label:last-child { align-self: flex-end; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-filters select { width: auto; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-history-row { padding: 16px 14px; gap: 10px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-metadata { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-detail > header { flex-wrap: wrap; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-detail table { min-width: 420px; }
+  .app-shell.workspace-theme.daily-workspace.organized-workspace .work-pay .work-pay-matches li { flex-wrap: wrap; }
+}

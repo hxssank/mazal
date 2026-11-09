@@ -1,0 +1,118 @@
+.records-workspace { gap: 22px; }
+.records-overview-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+.records-overview-heading > div:first-child { min-width: 0; }
+.records-eyebrow { display: block; color: var(--muted); font-size: 12px; margin-bottom: 9px; }
+.records-overview-heading h2 { margin: 0; color: var(--text); font-size: clamp(26px, 2.6vw, 36px); line-height: 1.15; font-weight: 550; letter-spacing: -1.1px; }
+.records-overview-heading p { max-width: 620px; margin: 11px 0 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.records-heading-actions { display: flex; flex-wrap: wrap; flex-shrink: 0; align-items: center; gap: 9px; }
+.records-overview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.records-overview-card { --record-color: var(--accent); position: relative; display: grid; grid-template-rows: auto auto 1fr auto; gap: 13px; min-width: 0; padding: 21px 22px 18px; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; color: var(--text); background: linear-gradient(135deg, color-mix(in srgb, var(--record-color) 6%, transparent), transparent 65%), var(--panel); font: inherit; text-align: left; cursor: pointer; }
+.records-overview-card::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: color-mix(in srgb, var(--record-color) 60%, transparent); opacity: .65; }
+.records-overview-card:hover { border-color: color-mix(in srgb, var(--record-color) 45%, var(--line)); background-color: var(--panel2); }
+.records-overview-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.records-import-card.has-pending { --record-color: #e6b889; }
+.records-files-card { --record-color: #bda4ed; }
+.records-card-label { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.records-card-label > svg:first-child { color: color-mix(in srgb, var(--record-color) 82%, var(--text)); }
+.records-card-label > svg:last-child { margin-left: auto; opacity: .55; }
+.records-card-number { display: flex; align-items: baseline; flex-wrap: wrap; gap: 9px; color: var(--text); font-size: clamp(30px, 3vw, 40px); font-weight: 500; line-height: 1.15; letter-spacing: -1.2px; font-variant-numeric: tabular-nums; }
+.records-card-number small { color: var(--muted); font-size: 12px; font-weight: 400; letter-spacing: 0; }
+.records-card-number.is-status { font-size: 25px; letter-spacing: -.6px; }
+.records-card-detail { max-width: 280px; min-height: 39px; color: var(--muted); font-size: 12px; line-height: 1.65; }
+.records-card-action { display: flex; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--accent-text, var(--accent)); font-size: 12px; }
+.records-card-action svg { margin-left: auto; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-navigation { width: fit-content; max-width: 100%; padding: 4px; gap: 3px; border: 1px solid var(--line); border-radius: 14px; background: var(--glass-fill); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-navigation button { min-height: 40px; padding: 9px 15px; border: 1px solid transparent; border-radius: 10px; font-size: 13px; color: var(--muted); background: transparent; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-navigation button[aria-pressed=true] { color: #f1f6ff; background: linear-gradient(135deg,#3696ff59,#7764fa45); border-color: #bfd9ff66; box-shadow: inset 0 1px #ffffff55,0 3px 10px #153d8240; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-navigation button[aria-pressed=true] span { color: inherit; background: color-mix(in srgb, var(--accent-ink) 8%, transparent); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-navigation button:not([aria-pressed=true]):hover { color: var(--text); background: var(--panel2); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-section { gap: 24px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review .past-review-header { align-items: flex-start; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-header h2 { font-size: 20px; font-weight: 600; letter-spacing: -.5px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-eyebrow { display: none; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-accounts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); padding: 18px 0; gap: 10px; border-bottom: 0; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-accounts button { padding: 15px; min-height: 74px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-accounts button[aria-pressed=true] { background: color-mix(in srgb, var(--accent) 8%, var(--panel)); border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-accounts button span { font-size: 12px; line-height: 1.5; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-statement { background: var(--panel); border-radius: 16px; }
+.records-review-period { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-top: 19px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.records-review-period > div { display: flex; flex-wrap: wrap; gap: 5px; }
+.records-review-period button { min-height: 36px; border: 1px solid transparent; border-radius: 8px; padding: 8px 11px; background: transparent; color: var(--muted); font-size: 12px; }
+.records-review-period button[aria-pressed=true] { color: var(--accent-text, var(--accent)); background: color-mix(in srgb, var(--accent) 12%, transparent); border-color: color-mix(in srgb, var(--accent) 25%, transparent); }
+.records-review-period button:hover:not([aria-pressed=true]) { color: var(--text); background: var(--panel2); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .records-review-period > p { margin: 0; font-size: 12px; line-height: 1.65; }
+.records-review-period > p > span { display: block; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-table { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-table th { padding: 13px 16px; background: #284368b8; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-table th:first-child { width: 180px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-table td { padding: 15px 16px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-filters button[aria-pressed=true] { color: #f1f6ff; background: linear-gradient(135deg,#3696ff59,#7764fa45); border-color: #bfd9ff66; box-shadow: inset 0 1px #ffffff55; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-filters button[aria-pressed=true] > span { color: inherit; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-view { border-radius: 14px; background: #14274880; box-shadow: inset 0 1px #ffffff20; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-view button { min-height: 40px; border: 1px solid transparent; border-radius: 10px; font-size: 13px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-view button[aria-pressed=true] { color: #f1f6ff; background: linear-gradient(135deg,#3696ff59,#7764fa45); border-color: #bfd9ff66; box-shadow: inset 0 1px #ffffff55; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-results { min-height: 52px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .past-review-no-matches { min-height: 170px; border: 1px dashed var(--line); border-radius: 14px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-import-heading { padding: 17px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-import-heading p { max-width: 620px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .import-queue { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 25px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .import-batches > div { padding: 18px 0; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .import-batches label > span { gap: 7px; line-height: 1.5; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .import-entries { padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel2); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .import-entry { padding-block: 15px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .statement-files { padding: 24px; border-color: var(--line); border-radius: 18px; background: var(--panel); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .statement-files header { display: flex; align-items: center; flex-wrap: wrap; gap: 9px 18px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .statement-files header h2 { color: var(--text); font-size: 19px; letter-spacing: -.35px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .statement-files header p { flex: 1 0 100%; margin: 0; color: var(--muted); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .statement-files header > button { margin-top: 6px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .statement-files li { padding-block: 19px; border-color: var(--line); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .statement-files li strong { color: var(--text); font-size: 14px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .statement-files li span, .app-shell.workspace-theme.daily-workspace .records-workspace .statement-files li small { color: var(--muted); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .statement-files li small { font-size: 12px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-account-history { border-color: var(--line); border-radius: 16px; background: var(--panel); overflow: hidden; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-account-history > summary { color: var(--text); padding: 20px 22px; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-account-history > summary span { color: var(--muted); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-workbook { padding: 16px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-workbook > summary { color: var(--text); width: 100%; }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-workbook-body p { color: var(--muted); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-section-empty { border-color: var(--line); background: var(--panel); }
+.app-shell.workspace-theme.daily-workspace .records-workspace .document-section-empty p { color: var(--muted); }
+[data-motion=on] .records-overview-card { transition: transform 220ms ease, border-color 220ms ease, background-color 220ms ease; animation: records-enter 420ms both; }
+[data-motion=on] .records-overview-card:nth-child(2) { animation-delay: 55ms; }
+[data-motion=on] .records-overview-card:nth-child(3) { animation-delay: 110ms; }
+[data-motion=on] .records-overview-card:hover { transform: translateY(-3px); }
+[data-motion=on] .records-card-number { animation: records-number 340ms ease-out; }
+.app-shell.workspace-theme.daily-workspace[data-motion=on] .records-workspace .document-section:not([hidden]) { animation: records-enter 320ms ease-out; }
+.app-shell.workspace-theme.daily-workspace[data-motion=on] .records-workspace .document-navigation button, [data-motion=on] .records-review-period button, .app-shell.workspace-theme.daily-workspace[data-motion=on] .records-workspace .past-review-accounts button { transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease; }
+@keyframes records-enter { from { opacity: .35; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes records-number { from { opacity: .4; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+@media (max-width: 1050px) {
+  .records-overview-heading { align-items: flex-start; flex-direction: column; gap: 18px; }
+  .records-overview-card { padding: 18px; }
+  .records-review-period { align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 700px) {
+  .records-overview { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .records-overview-card { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; gap: 8px 18px; padding: 17px 18px; border-radius: 15px; }
+  .records-card-label { grid-column: 1; }
+  .records-card-label > svg:last-child { display: none; }
+  .records-card-number { grid-column: 2; grid-row: 1 / 3; align-self: center; font-size: 31px; }
+  .records-card-number small { display: none; }
+  .records-card-detail { grid-column: 1; max-width: none; min-height: 0; font-size: 11px; }
+  .records-card-action { display: none; }
+  .app-shell.workspace-theme.daily-workspace .records-workspace .document-navigation { gap: 3px; }
+  .app-shell.workspace-theme.daily-workspace .records-workspace .document-navigation button { padding: 10px; font-size: 12px; }
+  .app-shell.workspace-theme.daily-workspace .records-workspace .past-review-accounts { display: none; }
+  .app-shell.workspace-theme.daily-workspace .records-workspace .import-queue, .app-shell.workspace-theme.daily-workspace .records-workspace .statement-files { padding: 18px; }
+  .app-shell.workspace-theme.daily-workspace .records-workspace .import-entries { padding: 13px; }
+  .app-shell.workspace-theme.daily-workspace .records-workspace .past-review-table tr { padding: 16px; }
+  .app-shell.workspace-theme.daily-workspace .records-workspace .past-review-table td { padding: 0; }
+  .records-review-period { padding: 12px; }
+  .records-review-period > div { gap: 2px; }
+  .records-review-period button { padding-inline: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .records-workspace *, .records-workspace *::before, .records-workspace *::after { animation: none !important; transition: none !important; }
+  .records-overview-card:hover { transform: none !important; }
+}

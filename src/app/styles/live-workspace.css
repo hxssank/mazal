@@ -1,0 +1,37 @@
+.workspace-theme.daily-workspace.organized-workspace .record-freshness { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; min-height: 36px; margin: -10px 0 20px; padding: 0 0 12px; border-bottom: 1px solid #b2d1ff20; font-size: 11px; color: var(--muted); }
+.record-freshness-source, .record-freshness-check { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.workspace-theme.daily-workspace.organized-workspace .record-freshness-source strong { font-size: 11px; font-weight: 550; color: #c1d3ec; white-space: nowrap; }
+.record-freshness-source > i { flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px #75d5ac0d; }
+.record-freshness[data-status=error] .record-freshness-source > i { background: var(--warning); box-shadow: 0 0 0 4px #e6bd770d; }
+.record-freshness[data-status=checking] .record-freshness-source > i { background: var(--accent-text); }
+.record-freshness-check { font-variant-numeric: tabular-nums; text-align: right; }
+.workspace-theme.daily-workspace.organized-workspace .record-freshness-check button { display: grid; place-items: center; flex: 0 0 auto; width: 30px; height: 30px; border: 1px solid #b2d1ff28; border-radius: 9px; background: #d7e8ff05; color: #b7d2f5; }
+.workspace-theme.daily-workspace.organized-workspace .record-freshness-check button:hover:not(:disabled) { background: #b2d1ff17; border-color: #b2d1ff60; }
+.animated-value { font: inherit; color: inherit; font-variant-numeric: tabular-nums; letter-spacing: inherit; }
+.workspace-theme.daily-workspace.organized-workspace[data-motion=on] .record-freshness[data-status=checking] .record-freshness-source > i { animation: record-check-pulse 1s ease-in-out infinite; }
+.workspace-theme.daily-workspace.organized-workspace[data-motion=on] .record-freshness[data-status=checking] .record-freshness-check svg { animation: record-check-spin 1.2s linear infinite; }
+.workspace-theme.daily-workspace.organized-workspace[data-motion=on] .page-body { animation: workspace-arrive .32s ease-out; }
+.workspace-theme.daily-workspace.organized-workspace[data-motion=on] :is(.home-action,.record-freshness-check button) { transition: background .2s, border-color .2s, box-shadow .2s; }
+.workspace-theme.daily-workspace.organized-workspace[data-motion=on]::before { background-size: 115% 115%; animation: workspace-light 24s ease-in-out infinite alternate; }
+.workspace-theme.daily-workspace.organized-workspace[data-window-hidden=true]::before,
+.workspace-theme.daily-workspace.organized-workspace[data-window-hidden=true] *,
+.workspace-theme.daily-workspace.organized-workspace[data-window-hidden=true] *::before,
+.workspace-theme.daily-workspace.organized-workspace[data-window-hidden=true] *::after { animation-play-state: paused !important; }
+.workspace-theme.daily-workspace.organized-workspace[data-motion=off] *,
+.workspace-theme.daily-workspace.organized-workspace[data-motion=off] *::before,
+.workspace-theme.daily-workspace.organized-workspace[data-motion=off] *::after { animation: none !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
+@keyframes record-check-pulse { 50% { box-shadow: 0 0 0 5px #89baff26; } }
+@keyframes record-check-spin { to { transform: rotate(360deg); } }
+@keyframes workspace-arrive { from { opacity: .6; } to { opacity: 1; } }
+@keyframes workspace-light { from { background-position: 0% 10%; } to { background-position: 100% 75%; } }
+@media (prefers-reduced-motion: reduce) {
+  .workspace-theme.daily-workspace.organized-workspace::before,
+  .workspace-theme.daily-workspace.organized-workspace *,
+  .workspace-theme.daily-workspace.organized-workspace *::before,
+  .workspace-theme.daily-workspace.organized-workspace *::after { animation: none !important; transition-duration: 0s !important; }
+}
+@media (max-width: 650px) {
+  .workspace-theme.daily-workspace.organized-workspace .record-freshness { align-items: flex-start; flex-wrap: wrap; gap: 7px; margin-top: -5px; margin-bottom: 16px; }
+  .record-freshness-source { flex-wrap: wrap; column-gap: 8px; row-gap: 4px; }
+  .record-freshness-check { justify-content: space-between; width: 100%; text-align: left; }
+}
