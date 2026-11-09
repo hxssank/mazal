@@ -8,8 +8,22 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
+import { stripVTControlCharacters } from 'node:util';
 import type { AppState } from '../shared/types.ts';
 import type { EngineEnvelope, EngineSummary, PayoffProjection, SpendingCalendarProjection } from '../shared/engine.ts';
+
+function engineProcessIds(log: string): string[] {
+  return [...stripVTControlCharacters(log).matchAll(/Started server process \[(\d+)\]/g)].map(match => match[1]);
+}
+
+test('engine process IDs retain plain and colored startup records', () => {
+  const plain = 'INFO:     Started server process [4676]\r\n';
+  const colored = '\u001b[32mINFO\u001b[0m:     Started server process [\u001b[36m4676\u001b[0m]\r\n';
+  assert.deepEqual(engineProcessIds(plain), ['4676']);
+  assert.deepEqual(engineProcessIds(colored), ['4676']);
+  assert.deepEqual(engineProcessIds(`${plain}${colored}`), ['4676', '4676']);
+  assert.deepEqual(engineProcessIds('INFO:     Application startup complete.'), []);
+});
 
 async function availablePort(): Promise<number> {
   const listener = createServer();
@@ -40,8 +54,8 @@ test('saved records refresh the running Python engine and projections leave reco
         child.kill('SIGTERM');
       });
     }
-    for (const match of engineLog.matchAll(/Started server process \[(\d+)\]/g)) {
-      const pid = Number(match[1]);
+    for (const value of engineProcessIds(engineLog)) {
+      const pid = Number(value);
       try { process.kill(process.platform === 'win32' ? pid : -pid, 'SIGTERM'); }
       catch (error) { if (!(error instanceof Error && 'code' in error && error.code === 'ESRCH')) throw error; }
     }
@@ -86,8 +100,8 @@ test('saved records refresh the running Python engine and projections leave reco
   assert.equal(emptySummary.result.summary.netWorthCents, 0);
   assert.deepEqual(await state(), initialState);
   const logDeadline = Date.now() + 5000;
-  while (!/Started server process \[\d+\]/.test(engineLog) && Date.now() < logDeadline) await delay(25);
-  const firstEnginePid = [...engineLog.matchAll(/Started server process \[(\d+)\]/g)].map(match => match[1]);
+  while (!engineProcessIds(engineLog).length && Date.now() < logDeadline) await delay(25);
+  const firstEnginePid = engineProcessIds(engineLog);
   assert.equal(firstEnginePid.length, 1, engineLog);
 
   const added = await post('/api/command?workspace=live', { type: 'add_account', entityId: 'personal', name: 'Synthetic cash', accountType: 'cash', openingBalanceCents: 100_000, openingDate: '2026-01-01', expectedRevision: initialState.revision, requestId: 'engine-refresh-cash' });
@@ -132,6 +146,6 @@ test('saved records refresh the running Python engine and projections leave reco
   const downloaded = await fetch(`${base}/api/documents/${document.id}/content?workspace=live`);
   assert.equal(downloaded.status, 200);
   assert.deepEqual(Buffer.from(await downloaded.arrayBuffer()), original);
-  assert.deepEqual([...engineLog.matchAll(/Started server process \[(\d+)\]/g)].map(match => match[1]), firstEnginePid);
+  assert.deepEqual(engineProcessIds(engineLog), firstEnginePid);
   assert.equal(child.exitCode, null);
 });
