@@ -4,13 +4,14 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 import type { Command, ExpensePlanItem } from '../shared/types.ts';
 
 function setup(t: { after: (fn: () => void) => void }) {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-plan-items-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, 'live.sqlite');
-  const store = createStore(path, 'live');
-  t.after(() => { try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
+  const store = trackTestResource(t, createStore(path, 'live'));
   return { store, path };
 }
 const item: ExpensePlanItem = { id: 'haircut', entityId: 'personal', categoryId: 'personal:personal', name: 'Haircut', amountCents: 3500, date: '2026-10-01', notes: 'Bring a reference photo.' };
@@ -26,9 +27,8 @@ test('plan details preserve money, dates and notes across restart and backup wit
   assert.equal(store.state().accounts.length, 0);
   assert.equal(store.state().transactions.length, 0);
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.state().expensePlanItems, [item, mealPlan]);
   reopened.restore(backup);
   assert.deepEqual(reopened.state().expensePlanItems, [item, mealPlan]);

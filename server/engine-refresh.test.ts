@@ -7,6 +7,7 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { setTimeout as delay } from 'node:timers/promises';
 import type { AppState } from '../shared/types.ts';
 import type { EngineEnvelope, EngineSummary, PayoffProjection, SpendingCalendarProjection } from '../shared/engine.ts';
 
@@ -84,8 +85,10 @@ test('saved records refresh the running Python engine and projections leave reco
   const emptySummary = await summary(initialState.revision);
   assert.equal(emptySummary.result.summary.netWorthCents, 0);
   assert.deepEqual(await state(), initialState);
+  const logDeadline = Date.now() + 5000;
+  while (!/Started server process \[\d+\]/.test(engineLog) && Date.now() < logDeadline) await delay(25);
   const firstEnginePid = [...engineLog.matchAll(/Started server process \[(\d+)\]/g)].map(match => match[1]);
-  assert.equal(firstEnginePid.length, 1);
+  assert.equal(firstEnginePid.length, 1, engineLog);
 
   const added = await post('/api/command?workspace=live', { type: 'add_account', entityId: 'personal', name: 'Synthetic cash', accountType: 'cash', openingBalanceCents: 100_000, openingDate: '2026-01-01', expectedRevision: initialState.revision, requestId: 'engine-refresh-cash' });
   assert.equal(added.status, 200);

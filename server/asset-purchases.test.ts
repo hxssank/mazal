@@ -4,6 +4,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 import { summarize, today } from '../shared/analytics.ts';
 import { purchaseAccountId } from '../shared/asset-purchases.ts';
 import { ledgerCSV } from '../shared/ledger.ts';
@@ -11,9 +12,9 @@ import type { AssetPurchase, Command } from '../shared/types.ts';
 
 function setup(t: { after: (fn: () => void) => void }) {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-purchase-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, 'live.sqlite');
-  const store = createStore(path, 'live');
-  t.after(() => { try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
+  const store = trackTestResource(t, createStore(path, 'live'));
   return { store, path };
 }
 const purchase: AssetPurchase = { id: 'bmw-m240i', entityId: 'personal', name: '2018 BMW M240i', payee: 'Mom', targetCents: 2000000, monthlyCents: 100000, paidCents: null, paidAsOf: '', notes: 'Payments and repairs contribute toward ownership.' };
@@ -65,9 +66,8 @@ test('payments and repairs exchange cash for car equity while gas remains ordina
   assert.match(ledgerCSV(store.state(), store.state().transactions), /2018 BMW M240i/);
   const backup = store.export();
   const expected = store.state();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.state().assetPurchases, expected.assetPurchases);
   reopened.restore(backup);
   assert.equal(summarize(reopened.state()).netWorthCents, 494000);

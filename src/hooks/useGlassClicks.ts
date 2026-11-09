@@ -36,11 +36,15 @@ export default function useGlassClicks(root: RefObject<HTMLDivElement | null>, m
       const diameter = Math.hypot(Math.max(x, box.width - x), Math.max(y, box.height - y)) * 2;
       clear(control);
       if (waves.size >= waveLimit) clear(waves.keys().next().value!);
+      const clip = document.createElement('span');
+      clip.className = 'glass-click-clip';
+      clip.setAttribute('aria-hidden', 'true');
       const wave = document.createElement('i');
       wave.className = 'glass-click-wave';
       wave.setAttribute('aria-hidden', 'true');
       Object.assign(wave.style, { left: `${x}px`, top: `${y}px`, width: `${diameter}px`, height: `${diameter}px`, pointerEvents: 'none' });
-      control.append(wave);
+      clip.append(wave);
+      control.append(clip);
       let animation: Animation;
       try {
         animation = wave.animate([
@@ -49,14 +53,14 @@ export default function useGlassClicks(root: RefObject<HTMLDivElement | null>, m
           { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
         ], { duration: 560, easing: 'cubic-bezier(.16, 1, .3, 1)' });
       } catch {
-        wave.remove();
+        clip.remove();
         return;
       }
-      const active = { element: wave, animation };
+      const active = { element: clip, animation };
       waves.set(control, active);
       const finish = () => {
         if (waves.get(control) === active) waves.delete(control);
-        wave.remove();
+        clip.remove();
       };
       void animation.finished.then(finish, finish);
     };

@@ -38,7 +38,7 @@ async function optionalBytes(path: string): Promise<Buffer | null> {
   catch (error) { if (error instanceof Error && 'code' in error && ['ENOENT', 'ENOTDIR'].includes(String(error.code))) return null; throw error; }
 }
 async function syncFile(path: string): Promise<void> {
-  const file = await open(path, 'r');
+  const file = await open(path, process.platform === 'win32' ? 'r+' : 'r');
   try { await file.sync(); } finally { await file.close(); }
 }
 async function syncDirectory(path:string):Promise<void> {

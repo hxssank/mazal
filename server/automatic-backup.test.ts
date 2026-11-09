@@ -2,9 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
+import fs from 'node:fs';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { syncBuiltinESMExports } from 'node:module';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { createAutomaticBackupService, type AutomaticBackupCredentials } from './automatic-backup.ts';
 import { createCompleteBackupService, decodeCompleteBackup } from './complete-backup.ts';
 import { createStore } from './store.ts';
@@ -37,12 +39,13 @@ function setup(t: test.TestContext, real = false) {
 function interruptStorageSetup(fixture: ReturnType<typeof setup>, point: 'created' | 'pinned'): void {
   const child = spawnSync(process.execPath, ['--input-type=module', '-e', `
     import fs from 'node:fs';
+    import { basename } from 'node:path';
     import { syncBuiltinESMExports } from 'node:module';
     import { createAutomaticBackupService } from './server/automatic-backup.ts';
     const [dataDirectory, destination, point] = process.argv.slice(1);
     const mkdir = fs.mkdirSync, write = fs.writeFileSync;
-    fs.mkdirSync = (path, ...args) => { const result = mkdir(path, ...args); if (point === 'created' && String(path).endsWith('/Mazal backups')) process.exit(73); return result; };
-    fs.writeFileSync = (path, ...args) => { if (point === 'pinned' && String(path).endsWith('/.mazal-owner')) process.exit(73); return write(path, ...args); };
+    fs.mkdirSync = (path, ...args) => { const result = mkdir(path, ...args); if (point === 'created' && basename(String(path)) === 'Mazal backups') process.exit(73); return result; };
+    fs.writeFileSync = (path, ...args) => { if (point === 'pinned' && basename(String(path)) === '.mazal-owner') process.exit(73); return write(path, ...args); };
     syncBuiltinESMExports();
     const service = createAutomaticBackupService({ dataDirectory, credentials: { get: async () => { throw new Error('Missing synthetic key'); }, set: async () => { throw new Error('Setup should stop before creating a key'); }, delete: async () => {} }, exportArchive: async () => { throw new Error('Setup should stop before export'); }, exclusive: operation => operation() });
     await service.configure({ destination });
@@ -52,6 +55,15 @@ function interruptStorageSetup(fixture: ReturnType<typeof setup>, point: 'create
 
 test('automatic backups encrypt, verify saved database/original bytes, persist status, and recover their key after restart', async t => {
   const fixture = setup(t, true);
+  const write = fs.writeFileSync;
+  const archiveModes: Array<number | string | undefined> = [];
+  t.mock.method(fs, 'writeFileSync', (...args: Parameters<typeof write>) => {
+    const [path, data, options] = args;
+    if (String(path).endsWith('.encrypted.mazal.tmp')) archiveModes.push(typeof options === 'object' && options !== null ? options.mode : undefined);
+    return write(path, data, options);
+  });
+  syncBuiltinESMExports();
+  t.after(() => { fs.writeFileSync = write; syncBuiltinESMExports(); });
   const documents = createDocumentStore(join(fixture.directory, 'documents/live'));
   const original = Buffer.from('%PDF-1.4\nSynthetic protected evidence');
   const document = documents.upload(original, { originalName: 'synthetic.pdf' }).document; documents.close();
@@ -67,7 +79,8 @@ test('automatic backups encrypt, verify saved database/original bytes, persist s
   assert.equal(createHash('sha256').update(bytes).digest('hex'), status.lastBackupSha256);
   assert.equal(readFileSync(join(fixture.root, '.data.automatic-backup.json'), 'utf8').includes(key.passphrase), false);
   assert.equal(JSON.stringify(status).includes(key.passphrase), false);
-  assert.equal(statSync(status.lastBackupPath).mode & 0o777, 0o600);
+  assert.deepEqual(archiveModes, [0o600]);
+  assert.equal(statSync(status.lastBackupPath).mode & (process.platform === 'win32' ? 0o700 : 0o777), 0o600);
   const reopened = await fixture.reopen(); assert.equal(reopened.status().lastBackupPath, status.lastBackupPath);
   assert.deepEqual(await reopened.recoveryKey(), key);
   await reopened.disable(); assert.equal(reopened.status().enabled, false); assert.deepEqual(await reopened.recoveryKey(), key);
@@ -114,12 +127,13 @@ test('failed setup resumes after crashes while removing its empty folder without
     const keyFile = join(fixture.root, 'synthetic-keychain.json');
     const child = spawnSync(process.execPath, ['--input-type=module', '-e', `
       import fs from 'node:fs';
+      import { basename } from 'node:path';
       import { syncBuiltinESMExports } from 'node:module';
       import { createAutomaticBackupService } from './server/automatic-backup.ts';
       const [dataDirectory, destination, keyFile, point] = process.argv.slice(1);
       const remove = fs.rmSync, rmdir = fs.rmdirSync;
-      fs.rmSync = (path, ...args) => { const result = remove(path, ...args); if (point === 'marker-removed' && String(path).endsWith('/.mazal-owner')) process.exit(74); return result; };
-      fs.rmdirSync = (path, ...args) => { const result = rmdir(path, ...args); if (point === 'folder-removed' && String(path).endsWith('/Mazal backups')) process.exit(74); return result; };
+      fs.rmSync = (path, ...args) => { const result = remove(path, ...args); if (point === 'marker-removed' && basename(String(path)) === '.mazal-owner') process.exit(74); return result; };
+      fs.rmdirSync = (path, ...args) => { const result = rmdir(path, ...args); if (point === 'folder-removed' && basename(String(path)) === 'Mazal backups') process.exit(74); return result; };
       syncBuiltinESMExports();
       const credentials = {
         get: async id => { const saved = fs.existsSync(keyFile) ? JSON.parse(fs.readFileSync(keyFile, 'utf8')) : {}; if (!saved[id]) throw new Error('Missing synthetic key'); return saved[id]; },
@@ -269,6 +283,7 @@ test('a process restart resumes interrupted first setup with its original key an
   const keyFile = join(fixture.root, 'synthetic-keychain.json');
   const child = spawnSync(process.execPath, ['--input-type=module', '-e', `
     import fs from 'node:fs';
+    import { basename } from 'node:path';
     import { syncBuiltinESMExports } from 'node:module';
     import { createAutomaticBackupService } from './server/automatic-backup.ts';
     import { createCompleteBackupService } from './server/complete-backup.ts';
@@ -327,15 +342,16 @@ test('destination changes recover crashes without losing the previous backups or
     await fixture.service.close();
     const child = spawnSync(process.execPath, ['--input-type=module', '-e', `
       import fs from 'node:fs';
+      import { basename } from 'node:path';
       import { syncBuiltinESMExports } from 'node:module';
       import { createAutomaticBackupService } from './server/automatic-backup.ts';
       const [dataDirectory, destination, point, savedKeys] = process.argv.slice(1);
       const keys = JSON.parse(savedKeys);
       const mkdir = fs.mkdirSync, write = fs.writeFileSync, remove = fs.rmSync, rmdir = fs.rmdirSync, rename = fs.renameSync;
-      fs.mkdirSync = (path, ...args) => { const result = mkdir(path, ...args); if (point === 'created' && String(path).endsWith('/Mazal backups')) process.exit(73); return result; };
-      fs.writeFileSync = (path, ...args) => { if (point === 'pinned' && String(path).endsWith('/.mazal-owner')) process.exit(73); return write(path, ...args); };
-      fs.rmSync = (path, ...args) => { const result = remove(path, ...args); if (point === 'marker-removed' && String(path).endsWith('/.mazal-owner')) process.exit(73); return result; };
-      fs.rmdirSync = (path, ...args) => { const result = rmdir(path, ...args); if (point === 'folder-removed' && String(path).endsWith('/Mazal backups')) process.exit(73); return result; };
+      fs.mkdirSync = (path, ...args) => { const result = mkdir(path, ...args); if (point === 'created' && basename(String(path)) === 'Mazal backups') process.exit(73); return result; };
+      fs.writeFileSync = (path, ...args) => { if (point === 'pinned' && basename(String(path)) === '.mazal-owner') process.exit(73); return write(path, ...args); };
+      fs.rmSync = (path, ...args) => { const result = remove(path, ...args); if (point === 'marker-removed' && basename(String(path)) === '.mazal-owner') process.exit(73); return result; };
+      fs.rmdirSync = (path, ...args) => { const result = rmdir(path, ...args); if (point === 'folder-removed' && basename(String(path)) === 'Mazal backups') process.exit(73); return result; };
       fs.renameSync = (from, to) => { const result = rename(from, to); if (point === 'archive-installed' && String(to).endsWith('.encrypted.mazal') || point === 'committed' && String(to).endsWith('.automatic-backup.json')) process.exit(73); return result; };
       syncBuiltinESMExports();
       const service = createAutomaticBackupService({ dataDirectory,
@@ -414,7 +430,7 @@ test('a missing or replaced destination fails without creating a fallback folder
   await assert.rejects(fixture.service.run(), /unavailable/); assert.equal(existsSync(fixture.destination), false);
   mkdirSync(fixture.destination);
   await assert.rejects(fixture.service.run(), /destination changed/); assert.deepEqual(readdirSync(fixture.destination), []);
-  assert.ok(existsSync(join(away, 'Mazal backups', before.lastBackupPath!.split('/').at(-1)!)));
+  assert.ok(existsSync(join(away, 'Mazal backups', basename(before.lastBackupPath!))));
 });
 
 test('setup refuses the live data folder, its children, and symbolic link destinations', async t => {

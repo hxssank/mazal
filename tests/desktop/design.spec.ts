@@ -111,6 +111,7 @@ test('a narrow bill form keeps keyboard focus and its draft when cancelling a di
 for (const width of [320, 390]) {
   test(`transaction choices remain readable in a ${width}px dialog`, async ({ page }) => {
     await page.setViewportSize({ width, height: 850 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     await page.getByRole('button', { name: 'Add transaction', exact: true }).click();
     const dialog = page.getByRole('dialog');
@@ -120,6 +121,25 @@ for (const width of [320, 390]) {
       await choice.click();
       await expect(choice).toHaveAttribute('aria-pressed', 'true');
       expect(await choice.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+      const animatedWidths = await choice.evaluate(element => {
+        const box = element.getBoundingClientRect();
+        const widths: { scroll: number; client: number }[] = [];
+        for (const fraction of [.5, .95]) {
+          element.dispatchEvent(new MouseEvent('click', {
+            bubbles: true, detail: 1, clientX: box.left + box.width * fraction, clientY: box.top + box.height / 2,
+          }));
+          const animation = element.querySelector('.glass-click-wave')?.getAnimations()[0];
+          if (!animation) throw new Error('Expected a click wave while motion is enabled.');
+          animation.pause();
+          for (const time of [0, 280, 559]) {
+            animation.currentTime = time;
+            widths.push({ scroll: element.scrollWidth, client: element.clientWidth });
+          }
+          animation.finish();
+        }
+        return widths;
+      });
+      for (const { scroll, client } of animatedWidths) expect(scroll).toBeLessThanOrEqual(client + 1);
       expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
     }
     await page.keyboard.press('Escape');

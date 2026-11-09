@@ -67,7 +67,8 @@ test('development rejects invalid API ports before starting a proxy', async () =
 test('production starts from its project directory and sets production mode', async t => {
   const { directory, launch } = await launchFixture(t, 'start.mjs', 'console.log(JSON.stringify({ cwd: process.cwd(), mode: process.env.NODE_ENV, engine: process.env.MAZAL_ENGINE_AUTOSTART }));');
   const { stdout } = await launch();
-  assert.deepEqual(JSON.parse(stdout), { cwd: await realpath(directory), mode: 'production', engine: '1' });
+  const result = JSON.parse(stdout);
+  assert.deepEqual({ ...result, cwd: await realpath(result.cwd) }, { cwd: await realpath(directory), mode: 'production', engine: '1' });
 });
 
 test('production reports a child terminated by a signal as a failed launch', { skip: process.platform === 'win32' }, async t => {

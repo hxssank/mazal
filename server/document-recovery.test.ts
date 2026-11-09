@@ -7,6 +7,7 @@ import { DatabaseSync } from 'node:sqlite';
 import test, { type TestContext } from 'node:test';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource } from './test-cleanup.ts';
 import { createDocumentStore, DocumentError } from './documents.ts';
 import { createDocumentRecovery } from './document-recovery.ts';
 import { decodeDocumentArchive } from './document-archive.ts';
@@ -16,12 +17,12 @@ const csv = Buffer.from('Date,Description,Amount\n');
 const digest = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
 function setup(t: TestContext, label: string) {
   const base = mkdtempSync(join(tmpdir(), `mazal-document-recovery-${label}-`));
+  deferTestCleanup(t, () => rmSync(base, { recursive: true, force: true }));
   const financePath = join(base, 'live.sqlite');
-  const finance = createStore(financePath, 'live');
+  const finance = trackTestResource(t, createStore(financePath, 'live'));
   const documentDirectory = join(base, 'documents');
   const sourceDirectory = join(base, 'source-documents');
-  const documents = createDocumentStore(documentDirectory, id => finance.state().accounts.some(account => account.id === id));
-  t.after(() => { documents.close(); finance.close(); rmSync(base, { recursive: true, force: true }); });
+  const documents = trackTestResource(t, createDocumentStore(documentDirectory, id => finance.state().accounts.some(account => account.id === id)));
   const recovery = createDocumentRecovery({ directory: documentDirectory, sourceDirectory, financePath, documents });
   return { base, finance, financePath, documents, documentDirectory, sourceDirectory, recovery };
 }
@@ -315,8 +316,7 @@ test('a database write failure rolls back installed files and metadata, then the
   const target = setup(t, 'rollback');
   target.finance.restore(fixture.backup, 0);
   const preview = await target.recovery.preview(fixture.archive, async () => target.finance.state());
-  const sql = new DatabaseSync(join(target.documentDirectory, 'documents.sqlite'));
-  t.after(() => sql.close());
+  const sql = trackTestResource(t, new DatabaseSync(join(target.documentDirectory, 'documents.sqlite')));
   sql.exec("CREATE TRIGGER reject_recovery BEFORE INSERT ON documents BEGIN SELECT RAISE(ABORT, 'Injected recovery failure'); END");
   const command = { token: preview.token, expectedRevision: preview.expectedRevision };
   assert.throws(() => target.recovery.commit(command, target.finance.state()));

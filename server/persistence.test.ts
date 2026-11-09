@@ -5,12 +5,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { createStore, RevisionConflictError, type StoredData } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 
 function setup(t: { after: (cleanup: () => void) => void }) {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-persistence-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, 'live.sqlite');
-  const store = createStore(path, 'live');
-  t.after(() => { try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
+  const store = trackTestResource(t, createStore(path, 'live'));
   return { directory, path, store };
 }
 
@@ -33,9 +34,10 @@ function populated(t: { after: (cleanup: () => void) => void }) {
 
 function legacyDatabase(path: string, data: StoredData): void {
   const database = new DatabaseSync(path);
-  database.exec('CREATE TABLE workspace_state (id INTEGER PRIMARY KEY CHECK(id=1), workspace TEXT NOT NULL, document TEXT NOT NULL)');
-  database.prepare('INSERT INTO workspace_state VALUES (1, ?, ?)').run('live', JSON.stringify(data));
-  database.close();
+  try {
+    database.exec('CREATE TABLE workspace_state (id INTEGER PRIMARY KEY CHECK(id=1), workspace TEXT NOT NULL, document TEXT NOT NULL)');
+    database.prepare('INSERT INTO workspace_state VALUES (1, ?, ?)').run('live', JSON.stringify(data));
+  } finally { database.close(); }
 }
 
 for (const fault of ['revision', 'reserves', 'payrollImports', 'declared-collection', 'array-value', 'null-scalar', 'array-scalar'] as const) {
@@ -43,8 +45,8 @@ for (const fault of ['revision', 'reserves', 'payrollImports', 'declared-collect
     const { store, path } = setup(t);
     store.command({ type: 'update_living_costs', monthlyEssentialsCents: 12345 });
     const before = store.state();
-    store.close();
-    const database = new DatabaseSync(path);
+    closeTestResource(store);
+    const database = trackTestResource(t, new DatabaseSync(path));
     const settings = JSON.parse((database.prepare('SELECT settings FROM workspace_meta WHERE id=1').get() as { settings: string }).settings);
     if (fault === 'null-scalar') settings.scalar = null;
     else if (fault === 'array-scalar') settings.scalar = [];
@@ -54,13 +56,13 @@ for (const fault of ['revision', 'reserves', 'payrollImports', 'declared-collect
     database.prepare('UPDATE workspace_meta SET settings=? WHERE id=1').run(JSON.stringify(settings));
     const saved = database.prepare('SELECT revision, settings FROM workspace_meta WHERE id=1').get();
     const records = database.prepare('SELECT * FROM audit_events ORDER BY position').all();
-    database.close();
-    assert.throws(() => createStore(path, 'live'), /Storage .*settings/);
-    const unchanged = new DatabaseSync(path, { readOnly: true });
+    closeTestResource(database);
+    assert.throws(() => trackTestResource(t, createStore(path, 'live')), /Storage .*settings/);
+    const unchanged = trackTestResource(t, new DatabaseSync(path, { readOnly: true }));
     try {
       assert.deepEqual(unchanged.prepare('SELECT revision, settings FROM workspace_meta WHERE id=1').get(), saved);
       assert.deepEqual(unchanged.prepare('SELECT * FROM audit_events ORDER BY position').all(), records);
-    } finally { unchanged.close(); }
+    } finally { closeTestResource(unchanged); }
   });
 }
 
@@ -68,8 +70,8 @@ for (const fault of ['omitted-wishes', 'missing-wish-table', 'omitted-generic-re
   test(`storage rejects ${fault} before startup can hide saved records`, t => {
     const { store, path } = setup(t);
     store.command({ type: 'save_wish_item', item: { id: 'saved-wish', entityId: 'personal', name: 'Saved wish', costCents: 12345, comment: '' }, expected: null, requestId: 'saved-wish' });
-    store.close();
-    const database = new DatabaseSync(path);
+    closeTestResource(store);
+    const database = trackTestResource(t, new DatabaseSync(path));
     const settings = JSON.parse((database.prepare('SELECT settings FROM workspace_meta WHERE id=1').get() as { settings: string }).settings);
     if (fault === 'missing-wish-table') database.exec('DROP TABLE wish_items');
     else {
@@ -86,10 +88,10 @@ for (const fault of ['omitted-wishes', 'missing-wish-table', 'omitted-generic-re
       audit: db.prepare('SELECT * FROM audit_events ORDER BY position').all(),
     });
     const before = snapshot(database);
-    database.close();
-    assert.throws(() => createStore(path, 'live'), /Storage .*collection/);
-    const unchanged = new DatabaseSync(path, { readOnly: true });
-    try { assert.deepEqual(snapshot(unchanged), before); } finally { unchanged.close(); }
+    closeTestResource(database);
+    assert.throws(() => trackTestResource(t, createStore(path, 'live')), /Storage .*collection/);
+    const unchanged = trackTestResource(t, new DatabaseSync(path, { readOnly: true }));
+    try { assert.deepEqual(snapshot(unchanged), before); } finally { closeTestResource(unchanged); }
   });
 }
 
@@ -98,23 +100,22 @@ for (const missingTable of [false, true]) {
     const { store, path } = setup(t);
     store.command({ type: 'add_reserve', entityId: 'personal', name: 'Keep reserve', amountCents: 12345 });
     const before = store.state();
-    store.close();
-    const database = new DatabaseSync(path);
+    closeTestResource(store);
+    const database = trackTestResource(t, new DatabaseSync(path));
     const settings = JSON.parse((database.prepare('SELECT settings FROM workspace_meta WHERE id=1').get() as { settings: string }).settings);
     settings.presentCollections = settings.presentCollections.filter((name: string) => name !== 'wishItems');
     database.prepare('UPDATE workspace_meta SET settings=? WHERE id=1').run(JSON.stringify(settings));
     if (missingTable) database.exec('DROP TABLE wish_items');
-    database.close();
-    const reopened = createStore(path, 'live');
-    try { assert.deepEqual(reopened.state(), before); } finally { reopened.close(); }
+    closeTestResource(database);
+    const reopened = trackTestResource(t, createStore(path, 'live'));
+    try { assert.deepEqual(reopened.state(), before); } finally { closeTestResource(reopened); }
   });
 }
 
 test('storage refuses omitted collections changed by another connection before reading or exporting them', t => {
   const { store, path } = setup(t);
   store.command({ type: 'save_wish_item', item: { id: 'saved-wish', entityId: 'personal', name: 'Saved wish', costCents: 12345, comment: '' }, expected: null, requestId: 'saved-wish' });
-  const database = new DatabaseSync(path);
-  t.after(() => database.close());
+  const database = trackTestResource(t, new DatabaseSync(path));
   const settings = JSON.parse((database.prepare('SELECT settings FROM workspace_meta WHERE id=1').get() as { settings: string }).settings);
   settings.presentCollections = settings.presentCollections.filter((name: string) => name !== 'wishItems');
   database.prepare('UPDATE workspace_meta SET settings=? WHERE id=1').run(JSON.stringify(settings));
@@ -128,12 +129,11 @@ test('current scalar settings preserve roadmap values and backup dates while the
   store.command({ type: 'update_living_costs', monthlyEssentialsCents: 12345 });
   store.command({ type: 'update_pay_schedule', payAmountCents: 200000, payEveryDays: 14, paydayAnchor: '2026-10-01' });
   const saved = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.export().data.roadmap, saved.data.roadmap);
   assert.equal(reopened.state().revision, saved.data.revision);
-  const database = new DatabaseSync(path, { readOnly: true });
+  const database = trackTestResource(t, new DatabaseSync(path, { readOnly: true }));
   try {
     const row = database.prepare('SELECT revision, settings FROM workspace_meta WHERE id=1').get() as { revision: number; settings: string };
     const settings = JSON.parse(row.settings);
@@ -141,7 +141,7 @@ test('current scalar settings preserve roadmap values and backup dates while the
     assert.equal(settings.scalar.lastBackupAt, reopened.state().lastBackupAt);
     assert.equal(row.revision, reopened.state().revision);
     assert.ok(settings.presentCollections.includes('payrollImports'));
-  } finally { database.close(); }
+  } finally { closeTestResource(database); }
 });
 
 test('migration verifies every record and archives the old snapshot before removing its redundant table', t => {
@@ -150,11 +150,9 @@ test('migration verifies every record and archives the old snapshot before remov
   const state = store.state();
   const path = join(directory, 'legacy.sqlite');
   legacyDatabase(path, before.data);
-  const migrated = createStore(path, 'live');
-  t.after(() => migrated.close());
+  const migrated = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(migrated.state(), state);
-  const database = new DatabaseSync(path, { readOnly: true });
-  t.after(() => database.close());
+  const database = trackTestResource(t, new DatabaseSync(path, { readOnly: true }));
   assert.equal(database.prepare("SELECT 1 FROM sqlite_schema WHERE name = 'workspace_state'").get(), undefined);
   const legacyFiles = readdirSync(join(directory, 'backups/live')).filter(name => name.includes('legacy-storage-archive'));
   assert.equal(legacyFiles.length, 1);
@@ -170,8 +168,7 @@ test('migration verifies every record and archives the old snapshot before remov
   assert.deepEqual(archive.data, before.data);
   const exported = migrated.export();
   assert.deepEqual({ ...exported.data, lastBackupAt: before.data.lastBackupAt }, before.data);
-  const recovered = createStore(join(directory, 'recovered.sqlite'), 'live');
-  t.after(() => recovered.close());
+  const recovered = trackTestResource(t, createStore(join(directory, 'recovered.sqlite'), 'live'));
   const recovery = recovered.restore(archive);
   assert.deepEqual(recovery.accounts, state.accounts);
   assert.deepEqual(recovery.transactions, state.transactions);
@@ -184,9 +181,8 @@ test('invalid migration rolls back every new table and leaves the original docum
   invalid.entries[0].debitCents++;
   const path = join(directory, 'invalid.sqlite');
   legacyDatabase(path, invalid);
-  assert.throws(() => createStore(path, 'live'), /journal transaction does not balance/);
-  const database = new DatabaseSync(path);
-  t.after(() => database.close());
+  assert.throws(() => trackTestResource(t, createStore(path, 'live')), /journal transaction does not balance/);
+  const database = trackTestResource(t, new DatabaseSync(path));
   assert.equal(database.prepare("SELECT 1 FROM sqlite_schema WHERE name = 'workspace_meta'").get(), undefined);
   assert.equal((database.prepare('SELECT document FROM workspace_state').get() as { document: string }).document, JSON.stringify(invalid));
   assert.equal(readdirSync(join(directory, 'backups/live')).filter(name => name.includes('before-relational-migration')).length, 0);
@@ -197,48 +193,46 @@ test('normalized records remain authoritative after migration and reopening', t 
   const backup = store.export();
   const path = join(directory, 'legacy.sqlite');
   legacyDatabase(path, backup.data);
-  const migrated = createStore(path, 'live');
+  const migrated = trackTestResource(t, createStore(path, 'live'));
   const newState = migrated.command({ type: 'add_reserve', entityId: 'personal', name: 'Buffer', amountCents: 1000 });
-  migrated.close();
-  const database = new DatabaseSync(path);
+  closeTestResource(migrated);
+  const database = trackTestResource(t, new DatabaseSync(path));
   database.exec('CREATE TABLE workspace_state (id INTEGER PRIMARY KEY CHECK(id=1), workspace TEXT NOT NULL, document TEXT NOT NULL)');
   database.prepare('INSERT INTO workspace_state VALUES (1, ?, ?)').run('live', '{}');
-  database.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(database);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.state(), newState);
   assert.equal(readdirSync(join(directory, 'backups/live')).filter(name => name.includes('before-relational-migration')).length, 2);
   const archiveFiles = readdirSync(join(directory, 'backups/live')).filter(name => name.includes('legacy-storage-archive'));
   assert.equal(archiveFiles.length, 2);
   assert.ok(archiveFiles.some(name => JSON.parse(readFileSync(join(directory, 'backups/live', name), 'utf8')).rows[0].document === '{}'));
-  const current = new DatabaseSync(path, { readOnly: true });
+  const current = trackTestResource(t, new DatabaseSync(path, { readOnly: true }));
   try { assert.equal(current.prepare("SELECT 1 FROM sqlite_schema WHERE name = 'workspace_state'").get(), undefined); }
-  finally { current.close(); }
+  finally { closeTestResource(current); }
 });
 
 test('legacy cleanup leaves both databases intact when recovery files cannot be saved', t => {
   const { store, directory, path } = populated(t);
   const before = store.export();
-  store.close();
+  closeTestResource(store);
   legacyDatabase(path, before.data);
   const backupDirectory = join(directory, 'backups/live');
   rmSync(backupDirectory, { recursive: true });
   writeFileSync(backupDirectory, 'A file blocks this recovery directory.');
-  assert.throws(() => createStore(path, 'live'));
-  const database = new DatabaseSync(path, { readOnly: true });
+  assert.throws(() => trackTestResource(t, createStore(path, 'live')));
+  const database = trackTestResource(t, new DatabaseSync(path, { readOnly: true }));
   try {
     assert.equal((database.prepare('SELECT document FROM workspace_state').get() as { document: string }).document, JSON.stringify(before.data));
     assert.equal((database.prepare('SELECT revision FROM workspace_meta').get() as { revision: number }).revision, before.data.revision);
     assert.equal((database.prepare('SELECT COUNT(*) AS n FROM transactions').get() as { n: number }).n, before.data.transactions.length);
     assert.deepEqual(database.prepare('PRAGMA integrity_check').all().map(row => row.integrity_check), ['ok']);
-  } finally { database.close(); }
+  } finally { closeTestResource(database); }
 });
 
 test('a category correction updates only that transaction and statement row, with no journal or account rewrites', t => {
   const { store, path } = populated(t);
   const transaction = store.state().transactions.find(row => row.statementRowId === 'purchase')!;
-  const database = new DatabaseSync(path);
-  t.after(() => database.close());
+  const database = trackTestResource(t, new DatabaseSync(path));
   database.exec('CREATE TABLE observed_changes (table_name TEXT NOT NULL, record_id TEXT NOT NULL)');
   for (const table of ['entities', 'accounts', 'transactions', 'journal_entries', 'statements', 'statement_rows']) {
     database.exec(`CREATE TRIGGER observe_${table} AFTER UPDATE ON ${table} BEGIN INSERT INTO observed_changes VALUES ('${table}', NEW.id); END`);
@@ -257,8 +251,7 @@ test('a category correction updates only that transaction and statement row, wit
 
 test('two connections reject stale writes and restore without losing the newer records', t => {
   const { store, path } = populated(t);
-  const second = createStore(path, 'live');
-  t.after(() => second.close());
+  const second = trackTestResource(t, createStore(path, 'live'));
   const backup = store.export();
   const expectedRevision = second.state().revision;
   const state = store.command({ type: 'add_reserve', entityId: 'personal', name: 'Buffer', amountCents: 1000, expectedRevision });
@@ -300,8 +293,7 @@ test('review decisions persist separately from unchanged source rows and survive
     rows: [{ id: 'coffee', transactionDate: '2026-01-02', postingDate: '2026-01-03', description: 'COFFEE ORIGINAL TEXT', amountCents: -1200, sourcePage: 3 }],
   };
   const staged = store.command({ type: 'stage_statement', statement: source, requestId: 'stage' });
-  const database = new DatabaseSync(path);
-  t.after(() => database.close());
+  const database = trackTestResource(t, new DatabaseSync(path));
   database.exec("CREATE TABLE source_updates (id TEXT); CREATE TRIGGER observe_source_update AFTER UPDATE ON import_source_rows BEGIN INSERT INTO source_updates VALUES (NEW.id); END;");
   const state = store.command({ type: 'review_statement', importId: source.id, decisions: [{ rowId: 'coffee', kind: 'expense', category: 'Coffee' }], expectedRevision: staged.revision, requestId: 'review' });
   assert.deepEqual(state.importBatches![0].source, source);
@@ -336,7 +328,7 @@ test('statement row identity is scoped to its source, including after categoriza
 
 test('strict persisted fields reject invalid SQL types and startup validation rejects malformed records', t => {
   const { store, path } = populated(t);
-  const database = new DatabaseSync(path);
+  const database = trackTestResource(t, new DatabaseSync(path));
   database.exec('PRAGMA foreign_keys = ON');
   const id = store.state().transactions.find(tx => tx.statementRowId === 'purchase')!.id;
   assert.throws(() => database.prepare("UPDATE transactions SET amount_cents = 'not cents' WHERE id = ?").run(id), /cannot store TEXT/);
@@ -347,8 +339,8 @@ test('strict persisted fields reject invalid SQL types and startup validation re
   const before = store.state();
   assert.throws(() => store.restore(invalid), /whole number/);
   assert.deepEqual(store.state(), before);
-  store.close();
+  closeTestResource(store);
   database.prepare("UPDATE transactions SET created_at = 'invalid date', data = json_set(data, '$.createdAt', 'invalid date') WHERE id = ?").run(id);
-  database.close();
-  assert.throws(() => createStore(path, 'live'), /valid ISO timestamp/);
+  closeTestResource(database);
+  assert.throws(() => trackTestResource(t, createStore(path, 'live')), /valid ISO timestamp/);
 });

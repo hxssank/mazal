@@ -5,15 +5,16 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 import { owedPaid, owedRemaining } from '../shared/asset-planning.ts';
 import { summarize } from '../shared/analytics.ts';
 import type { Command, MoneyOwed, OwedPayment, WishItem } from '../shared/types.ts';
 
 function setup(t: { after: (fn: () => void) => void }) {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-asset-planning-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, 'live.sqlite');
-  const store = createStore(path, 'live');
-  t.after(() => { try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
+  const store = trackTestResource(t, createStore(path, 'live'));
   store.command({ type: 'add_account', entityId: 'personal', name: 'Cash', accountType: 'cash', openingBalanceCents: 0, openingDate: '2026-01-01' });
   return { store, path };
 }
@@ -48,9 +49,8 @@ test('wish basket and money owed survive restart while repayments move cash exac
   assert.equal(summarize(expected).receivablesCents, 400000);
   assert.equal(summarize(expected).availableCents, summarize(before).availableCents + 50000);
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.state().wishItems, expected.wishItems);
   assert.deepEqual(reopened.state().moneyOwed, expected.moneyOwed);
   reopened.restore(backup);
@@ -117,8 +117,7 @@ test('repayment corrections restore the remaining tab and can be retried once sa
 test('stale tabs and payments reject across two database connections', t => {
   const { store, path } = setup(t);
   store.command({ type: 'save_money_owed', tab, expected: null, requestId: 'tab' });
-  const second = createStore(path, 'live');
-  t.after(() => second.close());
+  const second = trackTestResource(t, createStore(path, 'live'));
   const original = second.state().moneyOwed![0];
   store.command({ type: 'record_owed_payment', cashAccountId: cash(store), id: tab.id, expected: original, payment, requestId: 'pay' });
   const before = store.state();
@@ -181,14 +180,13 @@ test('legacy databases and backups default to empty lists and export both lists'
   store.restore(old);
   assert.deepEqual(store.state().wishItems, []);
   assert.deepEqual(store.state().moneyOwed, []);
-  store.close();
+  closeTestResource(store);
   const legacyPath = `${path}.legacy`;
-  const database = new DatabaseSync(legacyPath);
+  const database = trackTestResource(t, new DatabaseSync(legacyPath));
   database.exec('CREATE TABLE workspace_state (id INTEGER PRIMARY KEY, workspace TEXT NOT NULL, document TEXT NOT NULL)');
   database.prepare('INSERT INTO workspace_state (id, workspace, document) VALUES (1, ?, ?)').run('live', JSON.stringify(old.data));
-  database.close();
-  const reopened = createStore(legacyPath, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(database);
+  const reopened = trackTestResource(t, createStore(legacyPath, 'live'));
   assert.deepEqual(reopened.state().wishItems, []);
   assert.deepEqual(reopened.state().moneyOwed, []);
   const exported = reopened.export();

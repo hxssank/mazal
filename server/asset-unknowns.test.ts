@@ -6,12 +6,13 @@ import { test } from 'node:test';
 import { summarize } from '../shared/analytics.ts';
 import type { TrackedAsset, WishItem } from '../shared/types.ts';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 
 function setup(t: { after: (fn: () => void) => void }) {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-asset-unknowns-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, 'live.sqlite');
-  const store = createStore(path, 'live');
-  t.after(() => { try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
+  const store = trackTestResource(t, createStore(path, 'live'));
   return { store, path };
 }
 
@@ -30,9 +31,8 @@ test('unknown purchase cost survives restart and backup while resale value count
   assert.deepEqual(after.transactions, before.transactions);
   for (const costCents of [undefined, -1, 0.5]) assert.throws(() => store.command({ type: 'save_asset', asset: { ...laptop, costCents } } as unknown as Parameters<typeof store.command>[0]), /Purchase cost/);
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.state().assets, [laptop]);
   reopened.restore(backup);
   assert.deepEqual(reopened.state().assets, [laptop]);
@@ -52,9 +52,8 @@ test('unknown purchase date, resale value and wish price survive save, restart a
   store.command({ type: 'save_wish_item', item: zeroWish, expected: null, requestId: 'zero-wish' });
   store.command({ type: 'save_wish_item', item: legacyWish, expected: null, requestId: 'legacy-wish' });
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.state().assets, [asset, zeroAsset]);
   assert.deepEqual(reopened.state().wishItems, [wish, zeroWish, legacyWish]);
   reopened.restore(backup);

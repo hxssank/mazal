@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 import test, { type TestContext } from 'node:test';
 import type { Command, StatementDecision, StatementSource, StatementSourceRow } from '../shared/types.ts';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 import { createDocumentStore } from './documents.ts';
 import { createDocumentRecovery } from './document-recovery.ts';
 import { createCompleteBackupService } from './complete-backup.ts';
@@ -13,11 +14,11 @@ import { createCompleteBackupService } from './complete-backup.ts';
 function setup(t: TestContext) {
   t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-01-05T16:00:00Z') });
   const directory = mkdtempSync(join(tmpdir(), 'mazal-extend-activity-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, 'live.sqlite');
   const originals = join(directory, 'source-documents');
   mkdirSync(originals);
-  const store = createStore(path, 'live');
-  t.after(() => { try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
+  const store = trackTestResource(t, createStore(path, 'live'));
   const command = (input: Command) => store.command({ ...input, expectedRevision: store.state().revision });
   const accountId = command({ type: 'add_account', entityId: 'personal', name: 'Bank', accountType: 'cash', openingBalanceCents: 10000, openingDate: '2026-01-01' }).accounts[0].id;
   const save = (source: StatementSource): StatementSource => {
@@ -73,10 +74,10 @@ test('an extension imports a late row, matches a manual payment and offsets bala
   assert.deepEqual(state.transactions.find(transaction => transaction.id === payment.id)?.importSources, [{ importId: source.id, rowId: 'manual-row' }]);
   assert.deepEqual(store.command(request), state);
   store.restore(store.export());
-  store.close();
-  const reopened = createStore(path, 'live');
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   try { assert.equal(reopened.state().accounts[0].balanceCents, 6500); assert.deepEqual(reopened.state().importBatches![0].source, request.replacementSource); }
-  finally { reopened.close(); }
+  finally { closeTestResource(reopened); }
 });
 
 test('an appended transfer links the existing payment without posting either account twice', t => {
@@ -97,12 +98,11 @@ test('recovery and complete backups detect missing originals from earlier bank a
   commit(source, [{ rowId: 'original-row', kind: 'expense', category: 'Food' }]);
   store.command(extension([row('new-row', -500)]));
   const directory = dirname(path);
-  createStore(join(directory, 'demo.sqlite'), 'demo').close();
-  createDocumentStore(join(directory, 'documents', 'demo')).close();
+  closeTestResource(trackTestResource(t, createStore(join(directory, 'demo.sqlite'), 'demo')));
+  closeTestResource(trackTestResource(t, createDocumentStore(join(directory, 'documents', 'demo'))));
   const documentDirectory = join(directory, 'documents', 'live');
-  const documents = createDocumentStore(documentDirectory);
-  const backup = createCompleteBackupService(directory, { close: async () => {}, open: async () => {} });
-  t.after(() => { documents.close(); backup.close(); });
+  const documents = trackTestResource(t, createDocumentStore(documentDirectory));
+  const backup = trackTestResource(t, createCompleteBackupService(directory, { close: async () => {}, open: async () => {} }));
   const recovery = createDocumentRecovery({ directory: documentDirectory, sourceDirectory: originals, financePath: path, documents });
   assert.equal(recovery.health(store.state()).missingStatementSources, 0);
   rmSync(join(originals, source.sourceFile));

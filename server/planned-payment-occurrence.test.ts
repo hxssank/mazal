@@ -7,12 +7,13 @@ import type { DailyPlan } from '../shared/engine.ts';
 import type { Command } from '../shared/types.ts';
 import { engineFixtureResult } from '../src/engine-test-fixture.ts';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 
 function setup(t: { after: (cleanup: () => void) => void }) {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-payment-occurrence-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, 'live.sqlite');
-  const store = createStore(path, 'live');
-  t.after(() => { try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
+  const store = trackTestResource(t, createStore(path, 'live'));
   const cash = store.command({ type: 'add_account', entityId: 'personal', name: 'Bank', accountType: 'cash', openingBalanceCents: 600000, openingDate: '2026-01-01' }).accounts[0];
   store.command({ type: 'update_living_costs', monthlyEssentialsCents: 300000 });
   store.command({ type: 'update_planning_reserve', amountCents: 0 });
@@ -38,9 +39,8 @@ test('paying September rent in October preserves the October allowance across pa
   assert.equal(project().cashAfterKnownCents, before.cashAfterKnownCents);
   assert.equal(project().livingCostsCents, 150000);
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.equal(project(reopened).cashAfterKnownCents, before.cashAfterKnownCents);
   reopened.restore(backup);
   assert.deepEqual(reopened.state().transactions.filter(row => row.kind === 'expense').map(row => row.plannedPayment?.dueDate).sort(), ['2026-09-01', '2026-10-01']);
@@ -102,9 +102,8 @@ for (const direction of ['in', 'out'] as const) for (const scenario of [
     store.command(pay(scenario.gap));
     assert.deepEqual(store.state(), after);
     const backup = store.export();
-    store.close();
-    const reopened = createStore(path, 'live');
-    t.after(() => reopened.close());
+    closeTestResource(store);
+    const reopened = trackTestResource(t, createStore(path, 'live'));
     assert.deepEqual(reopened.state().obligations, after.obligations);
     reopened.restore(backup);
     assert.deepEqual(reopened.state().transactions, after.transactions);

@@ -4,14 +4,15 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 import type { Command, StatementImport, StatementSource } from '../shared/types.ts';
 import { summarizeSolHistory } from '../shared/sol-history.ts';
 
 function setup(t:{after:(cleanup:()=>void)=>void},accountType:'cash'|'debt') {
   const directory=mkdtempSync(join(tmpdir(),'mazal-quality-ledger-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path=join(directory,'test.sqlite');
-  const store=createStore(path,'live');
-  t.after(()=>{try{store.close();}catch{}rmSync(directory,{recursive:true,force:true});});
+  const store=trackTestResource(t, createStore(path,'live'));
   const accountId=store.command({type:'add_account',entityId:'personal',name:'Statement account',accountType,openingBalanceCents:10000,openingDate:'2026-01-01'}).accounts[0].id;
   store.command({type:'save_category_rule',rule:{id:'fuel',entityId:'personal',accountId:null,match:'contains',merchant:'PETRO',category:'Fuel & convenience',enabled:true},expected:null,requestId:'rule'});
   return {store,path,accountId};
@@ -38,9 +39,8 @@ test('merchant rules fill staged statement categories without changing source fa
   assert.deepEqual(fuel.importSources,[{importId:source.id,rowId:'fuel'}]);
   const backup=store.export();
   store.restore(backup);
-  store.close();
-  const reopened=createStore(path,'live');
-  t.after(()=>reopened.close());
+  closeTestResource(store);
+  const reopened=trackTestResource(t, createStore(path,'live'));
   assert.deepEqual(reopened.state().transactions,saved.transactions);
   assert.deepEqual(reopened.state().importBatches,saved.importBatches);
 });

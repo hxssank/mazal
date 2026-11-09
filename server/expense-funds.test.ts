@@ -4,13 +4,14 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 import type { Command, ExpenseFund, RoadmapSettings } from '../shared/types.ts';
 
 function setup(t: { after: (fn: () => void) => void }) {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-fund-test-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, 'live.sqlite');
-  const store = createStore(path, 'live');
-  t.after(() => { try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
+  const store = trackTestResource(t, createStore(path, 'live'));
   return { store, path };
 }
 
@@ -29,9 +30,8 @@ test('cost targets save progress without accounts and persist across restart and
   store.command({ type: 'save_expense_fund', fund: progressed, expected: fund, requestId: 'update-progress' });
   assert.deepEqual(store.state().expenseFunds, [progressed]);
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.state().expenseFunds, [progressed]);
   reopened.restore(backup);
   assert.deepEqual(reopened.state().expenseFunds, [progressed]);
@@ -114,9 +114,8 @@ test('one-time bills, monthly bills and expected income can be planned without c
   store.command({ type: 'update_obligation', id: tuition.id, expectedDueDate: tuition.dueDate, expectedStatus: 'planned', name: tuition.name, amountCents: 20000, dueDate: '2026-11-01', recurrence: tuition.recurrence, accountId: '', category: tuition.category, requestId: 'edit-unlinked-tuition' });
   const expected = store.state().obligations;
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.state().obligations, expected);
   reopened.restore(backup);
   assert.deepEqual(reopened.state().obligations, expected);
@@ -187,9 +186,8 @@ test('planning cash floor preserves named reserves and survives save, restart an
   assert.deepEqual(store.state().roadmap, { ...before.roadmap, planningCashReserveCents: 0 });
   assert.deepEqual(store.state().reserves, before.reserves);
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.equal(reopened.state().roadmap?.planningCashReserveCents, 0);
   reopened.restore(backup);
   assert.equal(reopened.state().roadmap?.planningCashReserveCents, 0);
@@ -227,9 +225,8 @@ test('additional income is explicit, validated, preserved by edits, and persiste
   assert.throws(() => store.command({ type: 'add_obligation', entityId: 'personal', name: 'Bad income', amountCents: 20000, dueDate: '2026-10-01', direction: 'in', recurrence: 'once', accountId: '', category: 'Income', additionalToPay: 'true' } as unknown as Command), /true or false/);
   assert.deepEqual(store.state(), before);
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.equal(reopened.state().obligations[0].additionalToPay, true);
   reopened.restore(backup);
   assert.equal(reopened.state().obligations[0].additionalToPay, true);

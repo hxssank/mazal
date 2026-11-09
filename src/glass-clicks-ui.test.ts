@@ -73,6 +73,9 @@ test('pointer clicks start at the click point without changing focus or suppress
   assert.equal(wave()?.style.top, '12px');
   assert.equal(wave()?.getAttribute('aria-hidden'), 'true');
   assert.equal(wave()?.style.pointerEvents, 'none');
+  assert.equal(wave()?.parentElement?.className, 'glass-click-clip');
+  assert.equal(wave()?.parentElement?.getAttribute('aria-hidden'), 'true');
+  assert.equal(wave()?.parentElement?.parentElement, control());
   assert.ok(Number.parseFloat(wave()!.style.width) >= 180);
   assert.equal(animations[0].options.duration, 560);
   assert.match(animations[0].keyframes[0].transform as string, /translate\(-50%, -50%\)/);
@@ -113,6 +116,7 @@ test('repeated clicks replace the prior wave and completion cannot remove its re
   animations[1].finish();
   await Promise.resolve();
   assert.equal(wave(), null);
+  assert.equal(control().querySelector('.glass-click-clip'), null);
 });
 
 test('at most six controls retain a wave during rapid clicking', async () => {
@@ -180,8 +184,17 @@ test('cancelled animations remove their wave and missing animation support leave
   animations[0].cancel();
   await Promise.resolve();
   assert.equal(wave(), null);
+  assert.equal(control().querySelector('.glass-click-clip'), null);
   Object.defineProperty(HTMLElement.prototype, 'animate', { configurable: true, writable: true, value: undefined });
   const event = click();
   assert.equal(event.defaultPrevented, false);
   assert.equal(wave(), null);
+});
+
+test('animation startup failure removes the clipping layer', async () => {
+  await act(async () => root.render(createElement(Probe)));
+  HTMLElement.prototype.animate = () => { throw new Error('Animation unavailable'); };
+  const event = click();
+  assert.equal(event.defaultPrevented, false);
+  assert.equal(control().querySelector('.glass-click-clip'), null);
 });

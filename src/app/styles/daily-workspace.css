@@ -126,7 +126,8 @@
 .daily-workspace[data-motion=on] .page-body > :not(.loading-panel) { animation: workspace-page-arrive .24s cubic-bezier(.22,1,.36,1); }
 @keyframes workspace-page-arrive { from { opacity: .35; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
 .workspace-theme.daily-workspace :is(.top-nav-item,.button,.toolbar-record,.toolbar-add-toggle,.motion-toggle,.expense-transaction-nav > button,.portfolio-status-filters > button,.mazal-segmented > button,.expense-page-nav > button,.expense-workspace-nav > button,.investment-section-tabs > button,.assets-section-tabs > button,.workspace-tabs > button,.document-navigation > button,.work-pay-nav > button) { position: relative; overflow: hidden; }
-.daily-workspace .glass-click-wave { position: absolute; z-index: 3; border-radius: 50%; border: 1px solid #d8f5ff85; background: radial-gradient(circle,#eefaff1a 28%,#bfefff38 55%,#abbdff08 72%); box-shadow: inset 0 0 12px #d4f5ff3d,0 0 8px #b9d8ff26; pointer-events: none; }
+.daily-workspace .glass-click-clip { position: absolute; inset: 0; z-index: 3; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.daily-workspace .glass-click-wave { position: absolute; border-radius: 50%; border: 1px solid #d8f5ff85; background: radial-gradient(circle,#eefaff1a 28%,#bfefff38 55%,#abbdff08 72%); box-shadow: inset 0 0 12px #d4f5ff3d,0 0 8px #b9d8ff26; pointer-events: none; }
 .workspace-theme.daily-workspace .toolbar-add {
   position: static;
   display: flex;

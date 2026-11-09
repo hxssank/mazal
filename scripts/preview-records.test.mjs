@@ -10,6 +10,7 @@ import { DatabaseSync } from 'node:sqlite';
 import test from 'node:test';
 import { promisify } from 'node:util';
 import { createRecordsPreview } from './preview-records.mjs';
+import { deferTestCleanup, trackTestResource, closeTestResource } from '../server/test-cleanup.ts';
 
 const execute = promisify(execFile);
 const hash = async path => createHash('sha256').update(await readFile(path)).digest('hex');
@@ -28,16 +29,16 @@ test('records preview can be imported from a stdin maintenance script without st
 
 async function fixture(t) {
   const directory = await mkdtemp(join(tmpdir(), 'mazal-preview-test-'));
+  deferTestCleanup(t, () => rm(directory, { recursive: true, force: true }));
   const source = join(directory, 'source');
   await mkdir(source);
-  const database = new DatabaseSync(join(source, 'live.sqlite'));
+  const database = trackTestResource(t, new DatabaseSync(join(source, 'live.sqlite')));
   database.exec(`PRAGMA journal_mode=WAL; PRAGMA wal_autocheckpoint=0;
     CREATE TABLE workspace_meta (id INTEGER PRIMARY KEY, workspace TEXT, revision INTEGER);
     INSERT INTO workspace_meta VALUES (1, 'live', 140);
     CREATE TABLE accounts (id TEXT PRIMARY KEY, type TEXT);
     CREATE TABLE positions (id TEXT PRIMARY KEY);
     INSERT INTO accounts VALUES ('cash', 'cash');`);
-  t.after(async () => { database.close(); await rm(directory, { recursive: true, force: true }); });
   return { directory, source, database };
 }
 
@@ -47,8 +48,7 @@ test('records preview copies WAL records and originals without auth files or sou
   const sources = join(source, 'source-documents');
   await mkdir(documents, { recursive: true });
   await mkdir(sources);
-  const metadata = new DatabaseSync(join(documents, 'documents.sqlite'));
-  t.after(() => metadata.close());
+  const metadata = trackTestResource(t, new DatabaseSync(join(documents, 'documents.sqlite')));
   metadata.exec(`PRAGMA journal_mode=WAL; PRAGMA wal_autocheckpoint=0;
     CREATE TABLE documents (id TEXT PRIMARY KEY, metadata TEXT);
     INSERT INTO documents VALUES ('document', '{"originalName":"statement.pdf"}');`);
@@ -62,8 +62,7 @@ test('records preview copies WAL records and originals without auth files or sou
   await writeFile(join(sources, '.session.json'), 'do not copy');
   const originalFiles = [join(source, 'live.sqlite'), join(source, 'live.sqlite-wal'), join(documents, 'documents.sqlite'), join(documents, 'documents.sqlite-wal'), join(documents, documentName), ...sourceNames.map(name => join(sources, name))];
   const before = await Promise.all(originalFiles.map(hash));
-  const preview = await createRecordsPreview(source);
-  t.after(preview.close);
+  const preview = trackTestResource(t, await createRecordsPreview(source));
   assert.equal(preview.revision, 140);
   if (process.platform !== 'win32') assert.equal((await stat(preview.directory)).mode & 0o777, 0o700);
   assert.deepEqual((await readdir(preview.directory)).sort(), ['documents', 'live.sqlite', 'source-documents']);
@@ -82,7 +81,7 @@ test('records preview copies WAL records and originals without auth files or sou
   assert.equal(await hash(join(preview.directory, 'documents', 'live', documentName)), before[4]);
   for (const [index, name] of sourceNames.entries()) assert.equal(await hash(join(preview.directory, 'source-documents', name)), before[5 + index]);
   assert.deepEqual(await Promise.all(originalFiles.map(hash)), before);
-  await preview.close();
+  await closeTestResource(preview);
   await preview.close();
   await assert.rejects(access(preview.directory), { code: 'ENOENT' });
 });
@@ -216,7 +215,13 @@ test('records launcher forwards termination before deleting its temporary copy',
     console.log(JSON.stringify({ ready: process.env.MAZAL_DATA_DIR }));
     setInterval(() => {}, 1000);`);
   const child = spawn(process.execPath, [script], { env, stdio: ['ignore', 'pipe', 'pipe'] });
-  t.after(() => { if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL'); });
+  deferTestCleanup(t, async () => {
+    if (child.exitCode === null && child.signalCode === null) {
+      const stopped = once(child, 'exit');
+      child.kill('SIGKILL');
+      await stopped;
+    }
+  });
   let output = '';
   const exited = once(child, 'exit');
   const directory = await new Promise((resolveReady, reject) => {

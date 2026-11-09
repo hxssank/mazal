@@ -4,14 +4,15 @@ import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createStore } from './store.ts';
+import { deferTestCleanup, trackTestResource, closeTestResource } from './test-cleanup.ts';
 import { today } from '../shared/analytics.ts';
 import type { Command } from '../shared/types.ts';
 
 function setup(t: { after: (fn: () => void) => void }, workspace: 'live' | 'demo' = 'live') {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-test-'));
+  deferTestCleanup(t, () => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, `${workspace}.sqlite`);
-  const store = createStore(path, workspace);
-  t.after(() => { try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
+  const store = trackTestResource(t, createStore(path, workspace));
   return { store, directory, path };
 }
 const day = today();
@@ -77,10 +78,10 @@ test('request IDs prevent duplicates across restart and reject different payload
   assert.equal(store.state().revision, revision);
   assert.equal(amount(store, cash), 17500);
   assert.throws(() => tx(store, 'expense', cash, 3500, 'same-request'), /different operation/);
-  store.close();
-  const reopened = createStore(path, 'live');
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   try { tx(reopened, 'expense', cash, 2500, 'same-request'); assert.equal(amount(reopened, cash), 17500); assert.equal(reopened.state().revision, revision); }
-  finally { reopened.close(); }
+  finally { closeTestResource(reopened); }
 });
 
 test('invalid cents, dates, references, overspending, overpayment and future entries leave state intact', t => {
@@ -254,8 +255,7 @@ test('a second window cannot record the same recurring payment with a different 
   store.command({ type: 'add_obligation', entityId: 'personal', accountId: cash, name: 'Phone', amountCents: 5000, dueDate: '2026-01-31', direction: 'out', recurrence: 'monthly', category: 'Bills' });
   const obligation = store.state().obligations[0];
   const payment = { type: 'pay_obligation', id: obligation.id, expectedDueDate: obligation.dueDate, requestId: 'first-window' } as const;
-  const second = createStore(path, 'live');
-  t.after(() => second.close());
+  const second = trackTestResource(t, createStore(path, 'live'));
   store.command(payment);
   const baseline = store.state();
   assert.throws(() => second.command({ ...payment, requestId: 'second-window' }), /date changed.*Refresh/);
@@ -329,9 +329,8 @@ test('subscriptions preserve payment history through price edits, cancellation, 
   assert.deepEqual(store.state(), baseline);
   const backup = store.export();
   const expected = store.state().obligations;
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.deepEqual(reopened.state().obligations, expected);
   reopened.restore(backup);
   assert.deepEqual(reopened.state().obligations, expected);
@@ -453,9 +452,8 @@ test('subscriptions can be tracked without accounts, restored, and linked before
   assert.throws(() => store.command({ type: 'pay_obligation', id, expectedDueDate: '2026-09-23', requestId: 'unlinked-paid' }), /Choose a payment account/);
   assert.deepEqual(store.state(), baseline);
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.equal(reopened.state().obligations[0].accountId, '');
   reopened.restore(backup);
   assert.equal(reopened.state().accounts.length, 0);
@@ -495,9 +493,8 @@ test('card subscriptions and payable bills record purchases once and survive res
   assert.equal(store.state().transactions.filter(item => item.kind === 'expense').length, 2);
   assert.equal(store.state().transactions.filter(item => item.kind === 'debt_payment').length, 0);
   const backup = store.export();
-  store.close();
-  const reopened = createStore(path, 'live');
-  t.after(() => reopened.close());
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   assert.equal(amount(reopened, card), 11299);
   reopened.restore(backup);
   reopened.command(subscriptionPayment);
@@ -581,9 +578,9 @@ test('roadmap preserves unknown amounts and real pay cadence through restart and
   assert.deepEqual(store.state().roadmap, settings);
   assert.throws(() => store.command({ type: 'save_roadmap', settings: { ...settings, loanAccountId: 'nonexistent' } }), /existing/);
   assert.throws(() => store.command({ type: 'save_roadmap', settings: { ...settings, payEveryDays: 0 } }), /between/);
-  store.close();
-  const reopened = createStore(path, 'live');
-  try { assert.deepEqual(reopened.state().roadmap, settings); } finally { reopened.close(); }
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
+  try { assert.deepEqual(reopened.state().roadmap, settings); } finally { closeTestResource(reopened); }
 });
 
 test('temporary hours survive restore and track changes to the full-time planning amount', t => {
@@ -621,9 +618,9 @@ test('debt terms preserve unconfirmed rates and unknown minimums through restart
   store.command({ type: 'set_debt_terms', accountId: loan, terms: { ...terms, aprPercent: 8, rateConfirmed: true, minimumPaymentCents: 15000 } });
   store.restore(backup);
   assert.deepEqual(store.state().accounts.find(item => item.id === loan)!.debtTerms, terms);
-  store.close();
-  const reopened = createStore(path, 'live');
-  try { assert.deepEqual(reopened.state().accounts.find(item => item.id === loan)!.debtTerms, terms); } finally { reopened.close(); }
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
+  try { assert.deepEqual(reopened.state().accounts.find(item => item.id === loan)!.debtTerms, terms); } finally { closeTestResource(reopened); }
 });
 
 test('family payment is a saved planning commitment without a fabricated loan or vehicle asset', t => {
@@ -672,10 +669,10 @@ test('category limits and resale assets survive restart and restore while record
   assert.equal(store.state().transactions.length, originalTransactions.length + 1);
   assert.equal(netWorth(store), 100000);
   store.restore(backup);
-  store.close();
-  const reopened = createStore(path, 'live');
+  closeTestResource(store);
+  const reopened = trackTestResource(t, createStore(path, 'live'));
   try { assert.deepEqual(reopened.state().spendingLimits, [limit]); assert.deepEqual(reopened.state().assets, [asset]); assert.equal(netWorth(reopened), 20000); }
-  finally { reopened.close(); }
+  finally { closeTestResource(reopened); }
 });
 
 test('spending limits reject invalid money, missing owners, and overlapping category aliases atomically', t => {
