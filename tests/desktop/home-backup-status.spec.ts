@@ -54,7 +54,7 @@ for (const source of ['sample', 'snapshot']) test(`a ${source} preview does not 
   });
   await page.route('**/api/automatic-backup', async route => { reads++; await route.abort(); });
   await page.goto('/#home');
-  await expect(page.locator('.home-record-status')).toContainText(source === 'snapshot' ? 'Saved records preview' : 'Saved records');
+  await expect(page.locator('.home-record-status')).toContainText(source === 'snapshot' ? 'Saved records preview' : 'Your money at a glance · CAD');
   await expect(page.getByRole('complementary', { name: 'Automatic backup health' })).toHaveCount(0);
   expect(reads).toBe(0);
 });

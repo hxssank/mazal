@@ -48,7 +48,14 @@ test('summary panels and dialogs retain readable text and keyboard focus', async
   await page.getByRole('button', { name: 'Add transaction', exact: true }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
-  await expect(dialog).toHaveCSS('backdrop-filter', /blur\(.+\) saturate\(.+\)/);
+  const reducedTransparency = await page.evaluate(() => matchMedia('(prefers-reduced-transparency: reduce)').matches);
+  if (reducedTransparency) {
+    await expect(dialog).toHaveCSS('backdrop-filter', 'none');
+    await expect(dialog).toHaveCSS('background-color', 'rgb(20, 33, 61)');
+    await expect(dialog).toHaveCSS('background-image', 'none');
+  } else {
+    await expect(dialog).toHaveCSS('backdrop-filter', /blur\(.+\) saturate\(.+\)/);
+  }
   await expect(dialog).toHaveCSS('color', 'rgb(237, 242, 250)');
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();

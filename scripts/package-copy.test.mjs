@@ -49,7 +49,7 @@ test('package copying preserves relative symlinks and verification rejects chang
     return;
   }
   await copyPackageTree(source, destination);
-  assert.equal(await readlink(join(destination, 'http.py')), 'protocols/http/h11_impl.py');
+  assert.equal(await readlink(join(destination, 'http.py')), join('protocols', 'http', 'h11_impl.py'));
   await rm(join(destination, 'http.py'));
   await symlink('server.py', join(destination, 'http.py'));
   await assert.rejects(verifyPackageCopy(source, destination), /symlink differs.*http\.py/);

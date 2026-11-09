@@ -36,7 +36,7 @@ test('a native cache hit skips compilation but verifies a new executable copy', 
   assert.equal(state.compiled, 1);
   assert.equal(state.verified, 2);
   assert.notEqual((await lstat(output)).ino, (await lstat(join(cacheDirectory, first.key, 'executable'))).ino);
-  assert.equal((await lstat(output)).mode & 0o111, 0o111);
+  if (process.platform !== 'win32') assert.equal((await lstat(output)).mode & 0o111, 0o111);
 });
 
 test('source, compiler, SDK, and deployment target changes each invalidate the native cache', async t => {

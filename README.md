@@ -66,7 +66,7 @@ npm test
 npm run check:release
 ```
 
-The full application suite was attempted during preparation but did not complete successfully in the restricted test environment. HTTP and desktop integration checks need a separate run with their required local services and permissions. The commands above describe the available checks; they do not claim a fully validated release.
+The [initial hosted release check](https://github.com/hxssank/mazal/actions/runs/42689324682) failed on a stale Home-label assertion, a dialog test that assumed transparency was enabled, and two Windows filesystem assertions. The test corrections preserve backup isolation, keyboard focus, cache verification, and symlink-target checks. On November 9, 2026, the corrected source built locally, 16 focused release tests passed, and three affected Chromium checks passed against isolated synthetic records. The full Linux, macOS, and Windows matrix still needs a successful rerun; these results do not establish a fully validated release.
 
 ## Current limits
 
