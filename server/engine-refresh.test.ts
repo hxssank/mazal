@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { stripVTControlCharacters } from 'node:util';
 import type { AppState } from '../shared/types.ts';
-import type { EngineEnvelope, EngineSummary, PayoffProjection, SpendingCalendarProjection } from '../shared/engine.ts';
+import type { DailyPlan, EngineEnvelope, EngineSummary, PayoffProjection, PlannerProjection, SpendingCalendarProjection } from '../shared/engine.ts';
 
 function engineProcessIds(log: string): string[] {
   return [...stripVTControlCharacters(log).matchAll(/Started server process \[(\d+)\]/g)].map(match => match[1]);
@@ -139,6 +139,25 @@ test('saved records refresh the running Python engine and projections leave reco
   const payoff = await payoffResponse.json() as EngineEnvelope<PayoffProjection>;
   assert.equal(payoff.result.base.months, 10);
   assert.equal(payoff.result.extra.months, 5);
+
+  const plannerResponse = await post('/api/engine/project?workspace=live', { ...identity, kind: 'planner', draft: {
+    pay: '1000', mom: '0', debt: '0', living: '100', firstPayday: '2026-01-02', startMonth: '2026-02', months: '1', frequency: '26',
+    investmentReturn: '0', extraDebt: '0', selectedDebtId: '', surplusDestination: 'cash', debts: {},
+  } });
+  assert.equal(plannerResponse.status, 200, await plannerResponse.clone().text());
+  const planner = await plannerResponse.json() as EngineEnvelope<PlannerProjection>;
+  assert.equal(planner.revision, saved.revision);
+  assert.equal(planner.result.error, '');
+  assert.equal(planner.result.input?.startingCashCents, 97_500);
+  assert.equal(planner.result.input?.payCents, 100_000);
+  assert.equal(planner.result.result?.days.length, 28);
+  const dailyResponse = await post('/api/engine/project?workspace=live', { ...identity, kind: 'daily_plan', draft: { days: 7 } });
+  assert.equal(dailyResponse.status, 200, await dailyResponse.clone().text());
+  const daily = await dailyResponse.json() as EngineEnvelope<DailyPlan>;
+  assert.equal(daily.revision, saved.revision);
+  assert.equal(daily.result.asOf, identity.asOf);
+  assert.equal(daily.result.cashCents, 97_500);
+  assert.equal(daily.result.days.length, 7);
 
   assert.deepEqual(await state(), beforeProjection);
   assert.deepEqual((await (await fetch(`${base}/api/documents?workspace=live`)).json()).documents, beforeDocuments);

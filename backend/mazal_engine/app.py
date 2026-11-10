@@ -5,6 +5,7 @@ import hmac
 import os
 import zipfile
 from contextlib import asynccontextmanager
+from importlib import import_module
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
@@ -19,6 +20,10 @@ from .storage import CalculationStorage, StorageConflict
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if os.name == "nt":
+        # NumPy can deadlock while another thread reads pipe-backed stdin.
+        # https://github.com/numpy/numpy/issues/24290
+        import_module("numpy")
     stop_parent_monitor = monitor_parent()
     cache = Path(os.environ.get("MAZAL_ENGINE_CACHE_DIR", Path(__file__).resolve().parents[1] / ".cache"))
     cache.mkdir(mode=0o700, parents=True, exist_ok=True)
