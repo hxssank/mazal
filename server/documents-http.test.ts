@@ -7,17 +7,14 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 import { MAX_DOCUMENT_BYTES } from './documents.ts';
+import { availableTestPort, waitForTestServer } from './test-server.ts';
 
 test('document HTTP workflow uploads, reviews, downloads, exports and isolates original files without changing financial records', async t => {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-documents-http-'));
-  const port = 30000 + Math.floor(Math.random() * 20000);
+  const port = await availableTestPort();
   const child = spawn(process.execPath, [fileURLToPath(new URL('./index.ts', import.meta.url))], { env: { ...process.env, PORT: String(port), MAZAL_DATA_DIR: directory }, stdio: ['ignore', 'pipe', 'pipe'] });
   t.after(async () => { if (child.exitCode === null) { const exited = new Promise<void>(resolve => child.once('exit', () => resolve())); child.kill('SIGTERM'); await exited; } rmSync(directory, { recursive: true, force: true }); });
-  await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Mazal document server did not start.')), 5000);
-    child.stdout.once('data', () => { clearTimeout(timer); resolve(); });
-    child.once('exit', code => { clearTimeout(timer); reject(new Error(`Mazal document server exited with ${code}.`)); });
-  });
+  await waitForTestServer(child, 'Mazal document server', 5000);
   const url = `http://127.0.0.1:${port}`;
   const initialFinance = await (await fetch(`${url}/api/state`)).json();
   const empty = await (await fetch(`${url}/api/documents`)).json();
@@ -82,14 +79,10 @@ test('document HTTP workflow uploads, reviews, downloads, exports and isolates o
 
 test('document HTTP upload rejects spoofed signatures, invalid metadata, oversized bodies and cross-origin access', async t => {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-documents-rejections-'));
-  const port = 30000 + Math.floor(Math.random() * 20000);
+  const port = await availableTestPort();
   const child = spawn(process.execPath, [fileURLToPath(new URL('./index.ts', import.meta.url))], { env: { ...process.env, PORT: String(port), MAZAL_DATA_DIR: directory }, stdio: ['ignore', 'pipe', 'pipe'] });
   t.after(async () => { if (child.exitCode === null) { const exited = new Promise<void>(resolve => child.once('exit', () => resolve())); child.kill('SIGTERM'); await exited; } rmSync(directory, { recursive: true, force: true }); });
-  await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Mazal document server did not start.')), 5000);
-    child.stdout.once('data', () => { clearTimeout(timer); resolve(); });
-    child.once('exit', code => { clearTimeout(timer); reject(new Error(`Mazal document server exited with ${code}.`)); });
-  });
+  await waitForTestServer(child, 'Mazal document server', 5000);
   const url = `http://127.0.0.1:${port}/api/documents`;
   const headers = { 'Content-Type': 'application/octet-stream', 'X-Mazal-Document': encodeURIComponent(JSON.stringify({ originalName: 'Statement.pdf', kind: 'statement' })) };
   assert.equal((await fetch(url, { method: 'POST', headers, body: '<html>not PDF</html>' })).status, 415);

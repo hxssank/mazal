@@ -6,19 +6,15 @@ import { request } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { availableTestPort, waitForTestServer } from './test-server.ts';
 
 async function startServer(t: TestContext): Promise<{ url: string; directory: string; workbookPath: string }> {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-master-workbook-http-'));
   const workbookPath = join(directory, 'master.xlsx');
-  const port = 30000 + Math.floor(Math.random() * 20000);
+  const port = await availableTestPort();
   const child = spawn(process.execPath, [fileURLToPath(new URL('./index.ts', import.meta.url))], { env: { ...process.env, PORT: String(port), MAZAL_DATA_DIR: join(directory, 'data'), MAZAL_MASTER_WORKBOOK: workbookPath }, stdio: ['ignore', 'pipe', 'pipe'] });
   t.after(async () => { if (child.exitCode === null) { const exited = new Promise<void>(resolve => child.once('exit', () => resolve())); child.kill('SIGTERM'); await exited; } rmSync(directory, { recursive: true, force: true }); });
-  await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Mazal master workbook server did not start.')), 5000);
-    child.stdout.once('data', () => { clearTimeout(timer); resolve(); });
-    child.once('error', error => { clearTimeout(timer); reject(error); });
-    child.once('exit', code => { clearTimeout(timer); reject(new Error(`Mazal master workbook server exited with ${code}.`)); });
-  });
+  await waitForTestServer(child, 'Mazal master workbook server', 5000);
   return { url: `http://127.0.0.1:${port}`, directory, workbookPath };
 }
 

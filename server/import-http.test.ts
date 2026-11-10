@@ -6,17 +6,14 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AppState } from '../shared/types.ts';
+import { availableTestPort, waitForTestServer } from './test-server.ts';
 
 test('HTTP stages only saved originals, commits reviewed rows, paginates, and exports an unchanged snapshot', async t => {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-import-http-'));
-  const port = 30000 + Math.floor(Math.random() * 20000);
+  const port = await availableTestPort();
   const child = spawn(process.execPath, [fileURLToPath(new URL('./index.ts', import.meta.url))], { env: { ...process.env, PORT: String(port), MAZAL_DATA_DIR: directory, MAZAL_MASTER_WORKBOOK: join(directory, 'export.xlsx') }, stdio: ['ignore', 'pipe', 'pipe'] });
   t.after(async () => { if (child.exitCode === null) { const exit = new Promise<void>(resolve => child.once('exit', () => resolve())); child.kill('SIGTERM'); await exit; } rmSync(directory, { recursive: true, force: true }); });
-  await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Import test server did not start.')), 8000);
-    child.stdout.once('data', () => { clearTimeout(timer); resolve(); });
-    child.once('exit', code => { clearTimeout(timer); reject(new Error(`Import test server exited with ${code}.`)); });
-  });
+  await waitForTestServer(child, 'Import test server', 8000);
   const url = `http://127.0.0.1:${port}`;
   const command = (body: unknown) => fetch(`${url}/api/command`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   let state: AppState = await (await command({ type: 'add_account', entityId: 'personal', name: 'Test chequing', accountType: 'cash', openingBalanceCents: 10000, openingDate: '2025-01-01', expectedRevision: 0, requestId: 'create-chequing' })).json();

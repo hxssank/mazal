@@ -6,20 +6,17 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import type { PayrollImport } from '../shared/payroll.ts';
+import { availableTestPort, waitForTestServer } from './test-server.ts';
 
 test('payroll HTTP import requires preserved matching originals and does not create cash', async t => {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-payroll-http-'));
-  const port = 30000 + Math.floor(Math.random() * 20000);
+  const port = await availableTestPort();
   const child = spawn(process.execPath, ['server/index.ts'], { env: { ...process.env, PORT: String(port), MAZAL_DATA_DIR: directory, MAZAL_MASTER_WORKBOOK: join(directory, 'export.xlsx') }, stdio: ['ignore', 'pipe', 'pipe'] });
   t.after(async () => {
     if (child.exitCode === null) { const exit = new Promise<void>(resolve => child.once('exit', () => resolve())); child.kill('SIGTERM'); await exit; }
     rmSync(directory, { recursive: true, force: true });
   });
-  await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Payroll test server did not start.')), 8000);
-    child.stdout.once('data', () => { clearTimeout(timer); resolve(); });
-    child.once('exit', code => { clearTimeout(timer); reject(new Error(`Payroll test server exited with ${code}.`)); });
-  });
+  await waitForTestServer(child, 'Payroll test server', 8000);
   const base = `http://127.0.0.1:${port}`;
   const bytes = '%PDF-1.4\nSynthetic payroll source';
   const sha256 = createHash('sha256').update(bytes).digest('hex');

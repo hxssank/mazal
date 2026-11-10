@@ -7,10 +7,11 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import test from 'node:test';
+import { availableTestPort } from './test-server.ts';
 
 test('the production launcher rejects development origins even when the parent uses development mode', async t => {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-production-start-'));
-  const port = 30000 + Math.floor(Math.random() * 20000);
+  const port = await availableTestPort();
   const child = spawn(process.execPath, ['scripts/start.mjs'], {
     cwd: fileURLToPath(new URL('..', import.meta.url)),
     env: { ...process.env, NODE_ENV: 'development', PORT: String(port), MAZAL_DATA_DIR: directory },

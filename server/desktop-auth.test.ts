@@ -7,6 +7,7 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createDesktopAuth } from './desktop-auth.ts';
+import { availableTestPort, waitForTestServer } from './test-server.ts';
 
 test('desktop records refuse startup without a valid launcher token', () => {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-desktop-marker-'));
@@ -22,7 +23,7 @@ test('desktop records refuse startup without a valid launcher token', () => {
 test('desktop authentication protects records, exports and assets and rejects replay and cross-origin unlocks', async t => {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-desktop-http-'));
   const token = randomBytes(32).toString('hex');
-  const port = 30000 + Math.floor(Math.random() * 20000);
+  const port = await availableTestPort();
   const child = spawn(process.execPath, ['server/index.ts'], { env: { ...process.env, NODE_ENV: 'production', MAZAL_ENGINE_AUTOSTART: '0', PORT: String(port), MAZAL_DATA_DIR: directory, MAZAL_DESKTOP_TOKEN: token }, stdio: ['ignore', 'pipe', 'pipe'] });
   t.after(async () => {
     if (child.exitCode === null && child.signalCode === null) {
@@ -32,11 +33,7 @@ test('desktop authentication protects records, exports and assets and rejects re
     }
     rmSync(directory, { recursive: true, force: true });
   });
-  await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Desktop server did not start.')), 10_000);
-    child.stdout.once('data', () => { clearTimeout(timer); resolve(); });
-    child.once('exit', code => { clearTimeout(timer); reject(new Error(`Desktop server exited with ${code}.`)); });
-  });
+  await waitForTestServer(child, 'Desktop server', 10_000);
   const base = `http://127.0.0.1:${port}`;
   const paths = ['/', '/assets/main.js', '/private/', '/api/state', '/api/transactions', '/api/documents', '/api/documents/export', '/api/backup', '/api/complete-backup', '/api/complete-backup/preview', '/api/complete-backup/restore', '/api/master-workbook', '/api/engine/health'];
   for (const path of paths) assert.equal((await fetch(`${base}${path}`)).status, 401, path);

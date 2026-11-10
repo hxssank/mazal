@@ -8,17 +8,14 @@ import { fileURLToPath } from 'node:url';
 import { createGzip, gzipSync, gunzipSync } from 'node:zlib';
 import { Readable } from 'node:stream';
 import { MAX_BACKUP_BYTES, readBackupFile } from '../shared/backup.ts';
+import { availableTestPort, waitForTestServer } from './test-server.ts';
 
 test('backups larger than both former limits export and restore through JSON and gzip without changing source data', async t => {
   const directory = mkdtempSync(join(tmpdir(), 'mazal-backup-http-'));
-  const port = 30000 + Math.floor(Math.random() * 20000);
+  const port = await availableTestPort();
   const child = spawn(process.execPath, [fileURLToPath(new URL('./index.ts', import.meta.url))], { env: { ...process.env, PORT: String(port), MAZAL_DATA_DIR: directory }, stdio: ['ignore', 'pipe', 'pipe'] });
   t.after(async () => { if (child.exitCode === null) { const exited = new Promise<void>(resolve => child.once('exit', () => resolve())); child.kill('SIGTERM'); await exited; } rmSync(directory, { recursive: true, force: true }); });
-  await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Mazal server did not start.')), 10000);
-    child.stdout.once('data', () => { clearTimeout(timer); resolve(); });
-    child.once('exit', code => { clearTimeout(timer); reject(new Error(`Mazal server exited with ${code}.`)); });
-  });
+  await waitForTestServer(child, 'Mazal server', 10000);
   const base = `http://127.0.0.1:${port}`;
   const backup = await (await fetch(`${base}/api/backup`)).json();
   backup.data.originalImports = [{ date: '2026-01-01T00:00:00.000Z', source: { preserved: 'x'.repeat(26 * 1024 * 1024) } }];
