@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
+import { once } from 'node:events';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 import test from 'node:test';
 
 test('the production launcher rejects development origins even when the parent uses development mode', async t => {
@@ -17,10 +19,11 @@ test('the production launcher rejects development origins even when the parent u
   let output = '';
   child.stderr.on('data', bytes => { output += bytes; });
   t.after(async () => {
-    if (child.exitCode === null && child.signalCode === null) {
-      const exited = new Promise<void>(resolve => child.once('exit', () => resolve()));
-      child.kill('SIGTERM');
-      await exited;
+    if (child.pid && child.exitCode === null && child.signalCode === null) {
+      const closed = once(child, 'close');
+      if (process.platform === 'win32') await promisify(execFile)('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true, timeout: 10_000 });
+      else child.kill('SIGTERM');
+      await closed;
     }
     rmSync(directory, { recursive: true, force: true });
   });
