@@ -10,6 +10,8 @@ for (const savedFirst of [false, true]) test(`a stalled save ${savedFirst ? 'aft
   const description = `Stalled save ${savedFirst ? 'after' : 'before'} commit ${crypto.randomUUID()}`;
   const sent: Command[] = [];
   let firstHandled = false;
+  let releaseRetry!: () => void;
+  const retryGate = new Promise<void>(resolve => { releaseRetry = resolve; });
   await page.route('**/api/command?workspace=live', async route => {
     sent.push(route.request().postDataJSON() as Command);
     if (sent.length === 1) {
@@ -20,13 +22,33 @@ for (const savedFirst of [false, true]) test(`a stalled save ${savedFirst ? 'aft
       firstHandled = true;
       return;
     }
+    await retryGate;
     await route.continue();
   });
   try {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.clock.install();
+    await page.addInitScript(() => {
+      // Hold React's queued work so a browser frame can precede the dialog removal commit.
+      const pending: (() => void)[] = [];
+      const scheduling = { hold: false, pending, release() { this.hold = false; pending.splice(0).forEach(deliver => deliver()); } };
+      Object.assign(window, { mazalCommitScheduling: scheduling });
+      const Channel = window.MessageChannel;
+      window.MessageChannel = class extends Channel {
+        constructor() {
+          super();
+          this.port1.addEventListener('message', event => {
+            if (!scheduling.hold) return;
+            event.stopImmediatePropagation();
+            pending.push(() => this.port1.onmessage?.call(this.port1, event));
+          });
+        }
+      };
+    });
     await page.goto('/#home');
     const open = page.getByRole('button', { name: 'Add transaction', exact: true });
+    // Pointer activation need not focus a button in WebKit.
+    await open.evaluate(element => element.addEventListener('pointerdown', event => event.preventDefault(), { once: true }));
     await open.click();
     const dialog = page.getByRole('dialog');
     await dialog.getByLabel('Description', { exact: true }).fill(description);
@@ -46,6 +68,17 @@ for (const savedFirst of [false, true]) test(`a stalled save ${savedFirst ? 'aft
     expect(sent).toHaveLength(1);
     if (savedFirst) await dialog.getByRole('button', { name: 'Review updated records', exact: true }).click();
     await dialog.getByRole('button', { name: 'Confirm original save', exact: true }).click();
+    await expect.poll(() => sent.length).toBe(2);
+    await page.evaluate(() => { (window as typeof window & { mazalCommitScheduling: { hold: boolean } }).mazalCommitScheduling.hold = true; });
+    releaseRetry();
+    await expect.poll(() => page.evaluate(() => (window as typeof window & { mazalCommitScheduling: { pending: unknown[] } }).mazalCommitScheduling.pending.length)).toBeGreaterThan(0);
+    const frameBeforeCommit = await page.evaluate(async () => {
+      await new Promise(requestAnimationFrame);
+      const dialogOpen = Boolean(document.querySelector('dialog[open]'));
+      (window as typeof window & { mazalCommitScheduling: { release: () => void } }).mazalCommitScheduling.release();
+      return dialogOpen;
+    });
+    expect(frameBeforeCommit).toBe(true);
     await expect(dialog).toHaveCount(0);
     await expect(open).toBeFocused();
     expect(sent).toHaveLength(2);
@@ -64,6 +97,7 @@ for (const savedFirst of [false, true]) test(`a stalled save ${savedFirst ? 'aft
     await expect(open).toBeEnabled();
     expect((await (await request.get('/api/state?workspace=live')).json()).revision).toBe(after.revision);
   } finally {
+    releaseRetry();
     let current = await (await request.get('/api/state?workspace=live')).json() as AppState;
     const saved = current.transactions.filter(transaction => transaction.description === description
       && !transaction.reversalOf && !current.transactions.some(other => other.reversalOf === transaction.id));

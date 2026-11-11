@@ -51,10 +51,11 @@ export default function App() {
   const formRef=useRef<FormSelection|null>(null);
   const activationTrigger=useRef<HTMLElement|null>(null);
   const formTrigger=useRef<HTMLElement|null>(null);
+  const pendingFormFocus=useRef<{trigger:HTMLElement|null}|null>(null);
   const accountsTrigger=useRef<HTMLElement|null>(null);
   const pageHeading=useRef<HTMLHeadingElement>(null);
   const { state, dataSource, readOnly, error, notice, refreshing, lastChecked, refresh, command, setError, setNotice } = useWorkspaceRecords(workspace, {
-    onResetForms: () => { formRef.current = null; setForm(null); },
+    onResetForms: () => { pendingFormFocus.current = null; formRef.current = null; setForm(null); },
   });
   const scope=state?.entities.find(entity=>entity.kind==='personal')?.id??'personal';
   useLiquidNavigation(navRef,view,appearance.motion);
@@ -71,7 +72,7 @@ export default function App() {
       const movedPage=acceptedRoute.current.view!==route.view||acceptedRoute.current.record!==record;
       acceptedRoute.current={view:route.view,record};
       setView(route.view);setSection(route.section);setRouteRecord(record);
-      setForm(null);formRef.current=null;setManageAccounts(false);
+      pendingFormFocus.current=null;setForm(null);formRef.current=null;setManageAccounts(false);
       if(movedPage){setNavigationFocus(value=>value+1);window.scrollTo(0,0);}
     }});
     routeHistory.current=navigation;
@@ -81,6 +82,14 @@ export default function App() {
     if(!navigationFocus||routeRecord)return;
     if(!document.querySelector('dialog[open]'))pageHeading.current?.focus({preventScroll:true});
   },[navigationFocus,routeRecord]);
+  useLayoutEffect(()=>{
+    if(form||!pendingFormFocus.current)return;
+    const {trigger}=pendingFormFocus.current;
+    pendingFormFocus.current=null;
+    if(!formRef.current&&!document.querySelector('dialog[open]')){
+      (trigger?.isConnected?trigger:pageHeading.current)?.focus({preventScroll:true});
+    }
+  },[form]);
   useEffect(()=>{
     const outside=(event:PointerEvent|FocusEvent)=>{
       const target=event.target as Node;
@@ -114,6 +123,7 @@ export default function App() {
     if(readOnly){setNotice('This preview is read-only. Open Mazal.app to change your records.');return;}
     const trigger=returnFocusTarget();
     requestDraftNavigation(()=>{
+    pendingFormFocus.current = null;
     formTrigger.current = trigger;
     if (addRef.current) addRef.current.open = false;
     setMoreOpen(false);
@@ -142,14 +152,9 @@ export default function App() {
   }
   function closeForm(selection: FormSelection) {
     if (formRef.current !== selection) return;
-    const trigger = formTrigger.current;
+    pendingFormFocus.current = { trigger: formTrigger.current };
     formRef.current = null;
     setForm(null);
-    window.requestAnimationFrame(() => {
-      if (!formRef.current && !document.querySelector('dialog[open]')) {
-        (trigger?.isConnected ? trigger : pageHeading.current)?.focus({ preventScroll: true });
-      }
-    });
   }
   function open(kind:FormKind,accountId?:string,positionId?:string){
     const debtDestination=kind==='transaction'&&view==='debts'?state?.accounts.find(account=>account.id===accountId&&(account.type==='debt'||account.type==='payable')):undefined;
